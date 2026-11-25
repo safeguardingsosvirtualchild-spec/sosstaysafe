@@ -5,9 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>What are your rights? | SOS StaySafe</title>
 <meta name="description" content="About the right of children and young people to stay safe, and the duty of SOS Children’s Villages.">
-<!-- Legacy WordPress address: https://sos-staysafe.com/what-are-your-rights/ (needs a redirect to this page at deployment) -->
 <link rel="canonical" href="https://sos-staysafe.com/your-rights.html">
 <link rel="icon" type="image/png" href="Images/favicon.png">
+<link rel="apple-touch-icon" href="Images/apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#1c325d">
 
 <!-- Open Graph (link previews) -->
@@ -25,18 +26,19 @@
 <meta property="og:locale:alternate" content="ru_RU">
 
 <script>
-  /* Runs before the page is drawn: marks JavaScript as available and applies the
-     visitor's language direction early, so Arabic does not flash left-to-right.
-     Order of precedence: ?lang= in the address, then the saved choice, then English. */
+  /* Runs before the page is drawn: marks JavaScript as available and applies the visitor's language and
+     direction early, so Arabic never flashes left-to-right. Order of precedence: ?lang= in the address,
+     then the language chosen earlier on this site, then the browser's preferred languages, then English. */
   (function () {
     var supported = ['en', 'es', 'fr', 'ar', 'pt', 'ru'];
-    var lang = 'en';
-    try {
-      var fromUrl = (new URLSearchParams(location.search).get('lang') || '').toLowerCase();
-      var saved = localStorage.getItem('sos-staysafe-lang');
-      if (supported.indexOf(fromUrl) > -1) lang = fromUrl;
-      else if (supported.indexOf(saved) > -1) lang = saved;
-    } catch (e) { /* storage blocked: stay with English */ }
+    function pick(code) { var p = String(code || '').toLowerCase().split('-')[0]; return supported.indexOf(p) > -1 ? p : null; }
+    var lang = null;
+    try { lang = pick(new URLSearchParams(location.search).get('lang')) || pick(localStorage.getItem('sos-staysafe-lang')); } catch (e) { /* storage blocked */ }
+    if (!lang) {
+      var prefs = navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language];
+      for (var i = 0; i < prefs.length && !lang; i++) lang = pick(prefs[i]);
+    }
+    lang = lang || 'en';
     var root = document.documentElement;
     root.classList.add('js');
     root.dataset.lang = lang;
@@ -44,240 +46,12 @@
     if (navigator.connection && navigator.connection.saveData) root.classList.add('save-data');
   })();
 </script>
-
+<link rel="stylesheet" href="site.css?v=2026-11-25">
 <style>
-/* =====================================================================
-   SOS StaySafe — shared styles (same design system as index.html; page-specific rules are marked)
-   Colours: SOS Brand Blue #00abec and Red #de5a6c (SOS brand guide);
-   navy #1c325d and text #212934 (existing StaySafe site settings).
-   --red-strong is the brand red darkened for 5:1 contrast with white text.
-   ===================================================================== */
-:root {
-  --navy: #1c325d;
-  --navy-dark: #14264a;
-  --blue: #00abec;
-  --blue-10: #e6f7fd;
-  --blue-20: #cceefb;
-  --red: #de5a6c;
-  --red-strong: #d02a40;
-  --red-strong-hover: #b62438;
-  --ink: #212934;
-  --ink-soft: #454545;
-  --line: #dbe3ec;
-  --white: #ffffff;
-  --radius: 16px;
-  --radius-sm: 10px;
-  --max: 1180px;
-  --font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
-  --font-ar: system-ui, "Segoe UI", Tahoma, "Noto Sans Arabic", "Geeza Pro", Arial, sans-serif;
-}
-
-*, *::before, *::after { box-sizing: border-box; }
-html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
-body { margin: 0; font-family: var(--font); font-size: 1rem; line-height: 1.6; color: var(--ink); background: var(--white); }
-html[lang="ar"] body { font-family: var(--font-ar); line-height: 1.8; }
-img, video { display: block; max-width: 100%; }
-h1, h2, h3 { color: var(--navy); line-height: 1.2; margin: 0 0 1rem; overflow-wrap: break-word; }
-.hero-grid > *, .split > *, .topics > *, .cards > *, .footer-grid > * { min-width: 0; }
-p { margin: 0 0 1rem; }
-a { color: var(--navy); text-underline-offset: 0.2em; }
-button, select { font: inherit; }
-
-/* Focus: navy ring on light backgrounds, white ring on dark ones */
-:focus-visible { outline: 3px solid var(--navy); outline-offset: 3px; border-radius: 4px; }
-main:focus { outline: none; }
-.on-dark :focus-visible { outline-color: var(--white); }
-
-.container { width: min(100% - 2.5rem, var(--max)); margin-inline: auto; }
-.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
-
-.skip-link { position: absolute; inset-inline-start: 1rem; top: -100px; z-index: 100; padding: 0.75rem 1rem; background: var(--navy); color: var(--white); font-weight: 700; border-radius: var(--radius-sm); }
-.skip-link:focus { top: 1rem; outline-color: var(--blue); }
-
-/* ---------- Buttons ---------- */
-.btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; min-height: 48px; padding: 0.7rem 1.5rem; border: 2px solid transparent; border-radius: 999px; font-weight: 700; line-height: 1.25; text-align: center; text-decoration: none; cursor: pointer; transition: background-color 0.15s, color 0.15s; }
-.btn-report { background: var(--red-strong); color: var(--white); }
-.btn-report:hover { background: var(--red-strong-hover); }
-.btn-outline { background: var(--white); border-color: var(--navy); color: var(--navy); }
-.btn-outline:hover { background: var(--navy); color: var(--white); }
-.arrow { display: inline-block; }
-[dir="rtl"] .arrow { transform: scaleX(-1); }
-
-/* ---------- Header and navigation (mobile first) ---------- */
-.site-header { position: sticky; top: 0; z-index: 50; background: var(--white); border-bottom: 1px solid var(--line); }
-.header-inner { display: grid; grid-template-columns: 1fr auto; grid-template-areas: "brand toggle" "panel panel"; align-items: center; column-gap: 1rem; }
-.brand { grid-area: brand; display: inline-flex; align-items: center; padding-block: 0.875rem; text-decoration: none; justify-self: start; }
-.brand img { width: auto; height: 32px; }
-/* "StaySafe" as an SOS sub-brand: separated by a dark blue bar. Clear space before the bar must be at least the
-   emblem's width; the emblem is 1.23 × the logo height (44px at the 36px logo height), so 2.875rem = 46px. */
-.brand-sub { display: none; margin-inline-start: 2.875rem; padding-inline-start: 1rem; border-inline-start: 2px solid var(--navy); color: var(--navy); font-weight: 800; font-size: 1.125rem; letter-spacing: 0.01em; line-height: 1.6; }
-
-.nav-toggle { grid-area: toggle; display: inline-flex; align-items: center; justify-content: center; width: 48px; height: 48px; padding: 0; border: 2px solid var(--navy); border-radius: var(--radius-sm); background: var(--white); color: var(--navy); cursor: pointer; }
-.nav-toggle-bars, .nav-toggle-bars::before, .nav-toggle-bars::after { display: block; width: 22px; height: 2px; background: currentColor; border-radius: 2px; transition: transform 0.2s; }
-.nav-toggle-bars { position: relative; }
-.nav-toggle-bars::before, .nav-toggle-bars::after { content: ""; position: absolute; inset-inline-start: 0; }
-.nav-toggle-bars::before { top: -7px; }
-.nav-toggle-bars::after { top: 7px; }
-.nav-toggle[aria-expanded="true"] .nav-toggle-bars { background: transparent; }
-.nav-toggle[aria-expanded="true"] .nav-toggle-bars::before { transform: translateY(7px) rotate(45deg); }
-.nav-toggle[aria-expanded="true"] .nav-toggle-bars::after { transform: translateY(-7px) rotate(-45deg); }
-html:not(.js) .nav-toggle { display: none; }
-
-.nav-panel { grid-area: panel; padding-block: 0.5rem 1.25rem; }
-.js .nav-panel { display: none; }
-.js .nav-panel.is-open { display: block; max-height: calc(100vh - 76px); overflow-y: auto; }
-
-.main-nav ul { list-style: none; margin: 0; padding: 0; }
-.main-nav a { display: flex; align-items: center; min-height: 48px; padding: 0.5rem 0.75rem; border-radius: var(--radius-sm); color: var(--navy); font-weight: 600; text-decoration: none; }
-.main-nav a:hover { background: var(--blue-10); }
-.main-nav a[aria-current="page"] { font-weight: 800; box-shadow: inset 4px 0 0 var(--blue); background: var(--blue-10); }
-[dir="rtl"] .main-nav a[aria-current="page"] { box-shadow: inset -4px 0 0 var(--blue); }
-.main-nav .nav-report { margin-top: 0.75rem; }
-.main-nav .nav-report a { justify-content: center; background: var(--red-strong); color: var(--white); border-radius: 999px; font-weight: 700; }
-.main-nav .nav-report a:hover { background: var(--red-strong-hover); }
-
-.lang-picker { display: flex; align-items: center; gap: 0.5rem; margin-top: 1rem; padding-inline: 0.75rem; color: var(--navy); }
-.lang-picker svg { flex: none; }
-.lang-picker select { min-height: 44px; padding: 0.4rem 2rem 0.4rem 0.75rem; border: 2px solid var(--navy); border-radius: var(--radius-sm); background: var(--white); color: var(--navy); font-weight: 600; cursor: pointer; }
-[dir="rtl"] .lang-picker select { padding: 0.4rem 0.75rem 0.4rem 2rem; }
-
-@media (min-width: 640px) {
-  .brand img { height: 36px; }
-  .brand-sub { display: inline-block; }
-}
-
-/* Desktop: logo and language on the first row, navigation on the second */
-@media (min-width: 1100px) {
-  .header-inner { grid-template-columns: auto 1fr; grid-template-areas: "brand tools" "nav nav"; }
-  .nav-toggle { display: none; }
-  .js .nav-panel, .nav-panel { display: contents; }
-  .lang-picker { grid-area: tools; justify-self: end; margin: 0; padding: 0; }
-  .main-nav { grid-area: nav; border-top: 1px solid var(--line); }
-  .main-nav ul { display: flex; flex-wrap: wrap; align-items: center; gap: 0.25rem; padding-block: 0.5rem; }
-  .main-nav a { min-height: 44px; padding: 0.5rem 0.85rem; font-size: 0.9375rem; }
-  .main-nav a[aria-current="page"], [dir="rtl"] .main-nav a[aria-current="page"] { background: none; box-shadow: inset 0 -3px 0 var(--blue); border-radius: 0; }
-  .main-nav .nav-report { margin-top: 0; margin-inline-start: auto; }
-  .main-nav .nav-report a { padding-inline: 1.25rem; }
-}
-
-/* ---------- Hero ---------- */
-.hero { background: var(--blue-10); padding-block: 2.5rem 3rem; }
-.hero-grid { display: grid; gap: 2rem; align-items: center; }
-.eyebrow { display: inline-flex; align-items: center; gap: 0.6rem; margin: 0 0 0.75rem; color: var(--navy); font-size: 0.875rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; }
-.eyebrow::before { content: ""; width: 28px; height: 4px; border-radius: 2px; background: var(--blue); }
-.hero h1 { font-size: clamp(1.875rem, 1.25rem + 2.6vw, 3rem); font-weight: 800; }
-.lead { font-size: 1.125rem; max-width: 38rem; }
-.actions { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 1.75rem; }
-
-.hero-media { position: relative; overflow: hidden; aspect-ratio: 16 / 9; border-radius: var(--radius); background: var(--blue-20); }
-.hero-media video { width: 100%; height: 100%; object-fit: cover; }
-.motion-toggle { position: absolute; inset-block-end: 0.75rem; inset-inline-end: 0.75rem; display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; padding: 0; border: 2px solid var(--white); border-radius: 50%; background: rgba(28, 50, 93, 0.88); color: var(--white); cursor: pointer; }
-.motion-toggle:focus-visible { outline-color: var(--navy); }
-/* Media icons keep their usual orientation in Arabic, as media players do */
-.motion-toggle .icon-pause { display: flex; gap: 4px; }
-.motion-toggle .icon-pause::before, .motion-toggle .icon-pause::after { content: ""; width: 4px; height: 14px; background: currentColor; border-radius: 1px; }
-.motion-toggle .icon-play { display: none; width: 0; height: 0; margin-left: 3px; border-top: 8px solid transparent; border-bottom: 8px solid transparent; border-left: 13px solid currentColor; }
-.motion-toggle[aria-pressed="true"] .icon-pause { display: none; }
-.motion-toggle[aria-pressed="true"] .icon-play { display: block; }
-
-@media (min-width: 900px) {
-  .hero { padding-block: 4rem 4.5rem; }
-  .hero-grid { grid-template-columns: 1fr 1.1fr; gap: 3.5rem; }
-}
-
-/* ---------- Content sections ---------- */
-.section { padding-block: 3.5rem; }
-.section-tint { background: var(--blue-10); }
-.section h2 { font-size: clamp(1.5rem, 1.15rem + 1.5vw, 2.125rem); font-weight: 800; }
-.split { display: grid; gap: 2rem; align-items: center; }
-.illustration { margin: 0; }
-.illustration img, .illustration canvas { display: block; width: 100%; max-width: 340px; height: auto; margin-inline: auto; border-radius: var(--radius); background: var(--white); }
-.panel { padding: 1.75rem; border-radius: var(--radius); background: var(--white); border-inline-start: 6px solid var(--blue); }
-@media (min-width: 800px) {
-  .section { padding-block: 5rem; }
-  .split { grid-template-columns: 1.5fr 1fr; gap: 3.5rem; }
-  .split-reverse > :first-child { order: 2; }
-  .panel { padding: 2.5rem; }
-}
-
-/* Topic rows: Your Rights, Preventing Abuse, Reporting Abuse */
-.topics { display: grid; gap: 1.5rem; }
-.topic { display: grid; overflow: hidden; border: 1px solid var(--line); border-radius: var(--radius); background: var(--white); }
-.topic img { width: 100%; height: 100%; aspect-ratio: 16 / 9; object-fit: cover; }
-.topic-body { display: flex; flex-direction: column; justify-content: center; padding: 1.75rem; }
-.topic-body h2 { margin-bottom: 0.75rem; }
-.topic-body p:last-of-type { margin-bottom: 1.25rem; }
-.text-link { display: inline-flex; align-items: center; gap: 0.5rem; min-height: 44px; align-self: flex-start; color: var(--navy); font-weight: 700; text-decoration: underline; text-decoration-thickness: 2px; text-decoration-color: var(--blue); }
-.text-link:hover { text-decoration-color: var(--navy); }
-@media (min-width: 800px) {
-  .topic { grid-template-columns: 1fr 1fr; min-height: 320px; }
-  .topic img { aspect-ratio: auto; }
-  .topic:nth-child(even) img { order: 2; }
-  .topic-body { padding: 2.5rem 3rem; }
-}
-
-/* Cyber Safeguarding and Fairness & Integrity cards */
-.cards { display: grid; gap: 1.5rem; }
-.card { display: flex; flex-direction: column; padding: 1.75rem; border-radius: var(--radius); background: var(--white); border-top: 6px solid var(--blue); }
-.card p { flex: 1; }
-@media (min-width: 800px) {
-  .cards { grid-template-columns: 1fr 1fr; }
-  .card { padding: 2.25rem 2.5rem; }
-}
-
-/* ---------- Report a safety concern ---------- */
-.report-cta { position: relative; color: var(--white); background: var(--navy) url("Images/report-concern-banner.jpg") center / cover no-repeat; }
-.report-cta::before { content: ""; position: absolute; inset: 0; background: rgba(28, 50, 93, 0.9); }
-.report-cta .container { position: relative; text-align: center; padding-block: 3.5rem; }
-.report-cta h2 { color: var(--white); font-size: clamp(1.625rem, 1.2rem + 1.8vw, 2.375rem); font-weight: 800; }
-.report-cta p { font-size: 1.125rem; max-width: 40rem; margin-inline: auto; }
-.report-cta .btn { margin-top: 0.75rem; font-size: 1.0625rem; padding-inline: 2rem; }
-.channel-note { margin-top: 1rem; font-size: 0.9375rem; color: var(--blue-20); }
-@media (min-width: 800px) { .report-cta .container { padding-block: 4.5rem; } }
-
-/* ---------- Footer ---------- */
-.site-footer { background: var(--navy); color: var(--white); padding-block: 3rem 2rem; }
-.site-footer a { color: var(--white); }
-.footer-grid { display: grid; gap: 2rem; }
-.footer-brand { display: inline-flex; align-items: center; text-decoration: none; }
-.footer-brand img { width: auto; height: 36px; }
-.footer-heading { margin: 0 0 0.75rem; color: var(--blue-20); font-size: 0.875rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
-.footer-links { list-style: none; margin: 0; padding: 0; }
-.footer-links a, .footer-links button { display: inline-flex; align-items: center; min-height: 44px; padding: 0; text-decoration: none; }
-.footer-links a:hover, .footer-links button:hover { text-decoration: underline; }
-.footer-langs { display: flex; flex-wrap: wrap; gap: 0.5rem; list-style: none; margin: 0; padding: 0; }
-.footer-langs button { min-height: 44px; padding: 0.35rem 0.9rem; border: 1px solid rgba(255, 255, 255, 0.5); border-radius: 999px; background: transparent; color: var(--white); cursor: pointer; }
-.footer-langs button[aria-pressed="true"] { background: var(--white); color: var(--navy); font-weight: 700; border-color: var(--white); }
-.footer-bottom { display: flex; flex-wrap: wrap; gap: 0.5rem 1.5rem; align-items: center; justify-content: space-between; margin-top: 2.5rem; padding-top: 1.5rem; border-top: 1px solid rgba(255, 255, 255, 0.25); font-size: 0.9375rem; }
-.footer-bottom p { margin: 0; }
-@media (min-width: 800px) {
-  .footer-grid { grid-template-columns: 1.2fr 1fr 1fr; gap: 3rem; }
-}
-
+/* Page-specific styles (shared styles are in site.css) */
 /* ---------- Your Rights page ---------- */
-.section-dark { background: var(--navy); color: var(--white); }
-.section-dark h2 { color: var(--white); }
 .highlight { padding-inline-start: 1.25rem; border-inline-start: 4px solid var(--blue); font-size: 1.0625rem; }
 .topic-body p:last-of-type { margin-bottom: 0; }
-.cards-intro { max-width: 46rem; font-size: 1.0625rem; }
-.embed-frame { position: relative; aspect-ratio: 16 / 9; margin-top: 1.5rem; overflow: hidden; border: 1px solid var(--line); border-radius: var(--radius); background: var(--blue-10); }
-.embed-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
-/* Visible focus while focus is inside the educational cards. Set by script: browsers do not pass
-   :focus-within across the boundary into another site's frame. */
-.embed-frame.has-focus { outline: 3px solid var(--navy); outline-offset: 3px; }
-
-/* ---------- Motion and data saving ---------- */
-@media (prefers-reduced-motion: reduce) {
-  html { scroll-behavior: auto; }
-  *, *::before, *::after { transition: none !important; animation: none !important; }
-  .illustration { display: none; }
-  .split { grid-template-columns: 1fr; }
-  .split > div { max-width: 48rem; }
-}
-/* Data saver on: skip the animated illustrations entirely */
-.save-data .illustration { display: none; }
-.save-data .split { grid-template-columns: 1fr; }
-.save-data .split > div { max-width: 48rem; }
 </style>
 </head>
 
@@ -413,7 +187,7 @@ html:not(.js) .nav-toggle { display: none; }
   </section>
 </main>
 
-<!-- ===================== 9. FOOTER ===================== -->
+<!-- ===================== FOOTER ===================== -->
 <footer class="site-footer on-dark">
   <div class="container">
     <div class="footer-grid">
@@ -421,6 +195,13 @@ html:not(.js) .nav-toggle { display: none; }
         <a class="footer-brand" href="index.html">
           <img src="Images/sos-logo-white.png" width="366" height="60" alt="SOS Children’s Villages – SOS StaySafe home" loading="lazy" decoding="async">
         </a>
+        <p class="footer-org"><a href="https://www.sos-childrensvillages.org/" target="_blank" rel="noopener"><span data-i18n="ui.intl">SOS Children’s Villages International</span><span class="sr-only" data-i18n="ui.newTab">(opens in a new tab)</span><span aria-hidden="true">↗</span></a></p>
+        <details class="footer-install">
+          <summary data-i18n="ui.install.title">Use SOS StaySafe on your phone</summary>
+          <p data-i18n="ui.install.android">Android: open the browser menu (⋮) and choose “Install app” or “Add to Home screen”.</p>
+          <p data-i18n="ui.install.ios">iPhone or iPad: in Safari, tap Share, then “Add to Home Screen”.</p>
+          <p data-i18n="ui.install.offline">Pages you have opened then work without internet. Reporting a concern on SOS SpeakUp always needs internet.</p>
+        </details>
       </div>
 
       <nav data-i18n-attr="aria-label:ui.footerNav" aria-label="Footer">
@@ -456,387 +237,117 @@ html:not(.js) .nav-toggle { display: none; }
 </footer>
 
 <script>
-/* =====================================================================
-   SOS StaySafe — page behaviour (same mechanism as index.html)
-   Your Rights page.
-   1. Translations   2. Language selection   3. Hero video, animations and educational cards
-   4. Mobile navigation
-   English is read from the page itself, so it is written only once (in the HTML above).
-   Text taken from the WordPress XML export of 24 November 2026.
-   A key missing from a language falls back to English and is marked lang="en".
-   ===================================================================== */
-
-/* ---------- 1. Translations (es, fr, ar, pt, ru) ---------- */
-const TRANSLATIONS = {
-  /* REVIEW (25 Nov 2026): cta.text keeps the existing translation ("if you have suffered abuse or neglect,
-     report it") until the revised English message is translated. cards.title has no French, Arabic or
-     Russian source in the XML, so those languages show the English heading. */
-  es: {
-    "nav.home": "Inicio",
-    "nav.rights": "Sus derechos",
-    "nav.preventing": "Prevención de abusos",
-    "nav.reporting": "Denuncia de malos tratos",
-    "nav.cyber": "Ciberseguridad",
-    "nav.report": "Reportar Preocupación",
-    "nav.privacy": "Política de privacidad",
-    "page.title": "Sus derechos",
-    "intro.title": "Introducción",
-    "intro.text1": "Empecemos hablando de tus derechos. Todos los niños del mundo tienen algunos derechos especiales, y todos ellos están recogidos en algo llamado \"Convención de las Naciones Unidas sobre los Derechos del Niño\". Es como una gran promesa de muchos países de que velarán por la protección de los derechos de la infancia.",
-    "intro.text2": "Todos estos derechos son importantísimos, y nadie puede quitárselos a los niños. Eso significa que tiene derecho a estar seguro y protegido de cualquier cosa que pueda perjudicarle, como malos tratos, abandono o que se aprovechen de él. Aldeas Infantiles SOS se compromete a defender estos derechos de niños y jóvenes.",
-    "general.title": "Información general",
-    "general.lead": "El derecho de los niños y jóvenes a estar seguros y el deber de Aldeas Infantiles SOS",
-    "general.text1": "Aldeas Infantiles SOS se compromete a proteger los derechos de los niños y a crear un lugar seguro y de apoyo donde los niños y los jóvenes puedan establecer relaciones sólidas y de confianza y dar lo mejor de sí mismos. Aldeas Infantiles SOS expone todo lo que se compromete a hacer para mantener a salvo a niños y jóvenes en un documento llamado \"Política de protección de la infancia y la juventud\".",
-    "general.text2": "La protección de la infancia y la juventud consiste en que Aldeas Infantiles SOS se asegure de tomar todas las medidas posibles para evitar que su personal, todos los que trabajan con ellos y todos sus programas hagan algo que pueda perjudicar a los niños y jóvenes o ponerlos en peligro. Y si algo sale mal, prometen solucionarlo de la forma adecuada. El daño puede venir de cosas como el abuso, el abandono o que se aprovechen de ti, y Aldeas Infantiles SOS está decidida a evitarlo.",
-    "youth.title": "Participación de los jóvenes en la salvaguardia",
-    "youth.text1": "Los niños y jóvenes tienen derecho a participar en todo lo que les afecta, especialmente cuando se trata de mantenerse seguros y de tomar decisiones que afectan a sus vidas. Es importante que conozcan sus derechos, que sepan cómo Aldeas Infantiles SOS los mantiene a salvo y que conozcan las formas de denunciar y obtener ayuda si la necesitan.",
-    "youth.text2": "Creen que los niños y los jóvenes son los verdaderos expertos en sus propias vidas, por lo que quieren escuchar lo que tienen que decir sobre lo que puede ser arriesgado o cómo se pueden mejorar las cosas. Cuando los niños y los jóvenes participan en la creación de un entorno seguro, ayudan a Aldeas Infantiles SOS a comprender mejor las necesidades y a garantizar el buen funcionamiento de sus programas. De este modo, todos pueden tener un lugar seguro y solidario donde crecer.",
-    "cards.title": "Tarjetas educativas",
-    "cards.intro": "Algunas formas de implicarse y participar en la protección y concienciación sobre sus derechos son:",
-    "cta.title": "Tienes derecho a estar seguro.",
-    "cta.text": "Si ha sufrido malos tratos o abandono, denúncielo.",
-    "cta.button": "NOTIFICAR UN PROBLEMA DE SEGURIDAD",
-    "footer.copyright": "Copyright",
-    "footer.rights": "Todos los derechos reservados"
-  },
-  fr: {
-    "nav.home": "Accueil",
-    "nav.rights": "Vos droits",
-    "nav.preventing": "Prévenir les abus",
-    "nav.reporting": "Signaler un abus",
-    "nav.cyber": "Sauvegarde cybernétique",
-    "nav.report": "Signaler une préoccupation",
-    "nav.privacy": "Politique de confidentialité",
-    "page.title": "Vos droits",
-    "intro.title": "Introduction",
-    "intro.text1": "Commençons par parler de vos droits ! Chaque enfant dans le monde a des droits particuliers, qui sont énoncés dans la \"Convention des Nations unies relative aux droits de l'enfant\". C'est comme une grande promesse faite par de nombreux pays de veiller à ce que les droits de l'enfant soient protégés.",
-    "intro.text2": "Tous ces droits sont très importants et personne ne peut les retirer aux enfants. Cela signifie que vous avez le droit d'être en sécurité et protégé contre tout ce qui pourrait lui nuire, comme la maltraitance, la négligence ou les abus. SOS Villages d'Enfants s'engage à faire respecter ces droits pour les enfants et les jeunes.",
-    "general.title": "Informations générales",
-    "general.lead": "Le droit des enfants et des jeunes à la sécurité et le devoir de SOS Villages d'Enfants",
-    "general.text1": "SOS Villages d'Enfants s'engage à protéger les droits des enfants et à créer un lieu sûr et solidaire où les enfants et les jeunes peuvent établir des relations solides et de confiance et donner le meilleur d'eux-mêmes. SOS Villages d'Enfants présente tout ce qu'elle s'engage à faire pour assurer la sécurité des enfants et des jeunes dans un document intitulé \"Child and Youth Safeguarding Policy\" (Politique de sauvegarde des enfants et des jeunes).",
-    "general.text2": "La protection des enfants et des jeunes consiste pour SOS Villages d'Enfants à s'assurer qu'ils prennent toutes les mesures possibles pour empêcher leur personnel, toutes les personnes qui travaillent avec eux et tous leurs programmes de faire quoi que ce soit qui puisse blesser les enfants et les jeunes ou les mettre en danger. Et si quelque chose ne va pas, ils promettent d'y remédier de manière appropriée. Le préjudice peut résulter d'abus, de négligence ou d'exploitation, et SOS Villages d'Enfants est déterminé à l'éviter.",
-    "youth.title": "La participation des jeunes à la sauvegarde",
-    "youth.text1": "Les enfants et les jeunes ont le droit de participer à tout ce qui les concerne, en particulier lorsqu'il s'agit de rester en sécurité et de prendre des décisions qui affectent leur vie. Il est important qu'ils connaissent leurs droits, qu'ils comprennent comment SOS Villages d'Enfants assure leur sécurité et qu'ils sachent comment signaler un cas et obtenir de l'aide s'ils en ont besoin.",
-    "youth.text2": "Ils sont convaincus que les enfants et les jeunes sont les véritables experts de leur propre vie. Ils veulent donc entendre ce que vous avez à dire sur ce qui pourrait être risqué ou sur la manière dont les choses pourraient être améliorées. Lorsque les enfants et les jeunes participent à la création d'un environnement sûr, SOS Villages d'Enfants est mieux à même de comprendre les besoins et de veiller au bon fonctionnement de ses programmes. De cette manière, tout le monde peut disposer d'un endroit sûr et favorable pour grandir.",
-    "cards.intro": "Voici quelques moyens de s'impliquer et de participer à la protection et à la sensibilisation aux droits de ces personnes :",
-    "cta.title": "Vous avez le droit d'être en sécurité.",
-    "cta.text": "Si vous avez été victime d'un abus ou d'une négligence, signalez-le.",
-    "cta.button": "SIGNALER UN PROBLÈME DE SÉCURITÉ",
-    "footer.copyright": "Copyright",
-    "footer.rights": "Tous droits réservés"
-  },
-  ar: {
-    "nav.home": "بيت",
-    "nav.rights": "حقوقك",
-    "nav.preventing": "منع إساءة المعاملة",
-    "nav.reporting": "الإبلاغ عن إساءة المعاملة",
-    "nav.cyber": "الحماية السيبرانية",
-    "nav.report": "الإبلاغ عن القلق",
-    "nav.privacy": "سياسة الخصوصية",
-    "page.title": "حقوقك",
-    "intro.title": "مقدمة",
-    "intro.text1": "دعونا نبدأ الأمور بالحديث عن حقوقك! يتمتع كل طفل حول العالم ببعض الحقوق الخاصة، وكلها منصوص عليها في ما يسمى \"اتفاقية الأمم المتحدة لحقوق الطفل\". إنه بمثابة وعد كبير من العديد من البلدان بأنها سوف تتأكد من حماية حقوق الطفل.",
-    "intro.text2": "كل هذه الحقوق مهمة للغاية، ولا يمكن لأحد أن ينتزعها من الأطفال. وهذا يعني أن لديك الحق في أن تكون آمنًا ومحميًا من أي شيء يمكن أن يؤذيهم، مثل الإساءة أو الإهمال أو الاستغلال. تلتزم قرى الأطفال SOS بدعم هذه الحقوق للأطفال والشباب.",
-    "general.title": "معلومات عامة",
-    "general.lead": "حول حقوق الأطفال واليافعين في البقاء آمنين وواجب قرى الأطفال SOS",
-    "general.text1": "تلتزم قرى الأطفال SOS بحماية حقوق الأطفال وإنشاء مكان آمن وداعم حيث يمكن للأطفال والشباب بناء علاقات قوية وجديرة بالثقة وأن يكونوا في أفضل حالاتهم. تحدد قرى الأطفال SOS كل ما وعدت بفعله للحفاظ على سلامة الأطفال والشباب في وثيقة تسمى \"سياسة حماية الأطفال والشباب\".",
-    "general.text2": "إن حماية الأطفال والشباب تدور حول قيام قرى الأطفال SOS بالتأكد من اتخاذ كل خطوة ممكنة للحفاظ على موظفيها وكل من يعمل معهم وجميع برامجهم من القيام بأي شيء قد يؤذي الأطفال والشباب أو يعرضهم للخطر. وإذا حدث خطأ ما، فإنهم يعدون بالتعامل معه بالطريقة الصحيحة. يمكن أن يأتي الضرر من أشياء مثل سوء المعاملة أو الإهمال أو الاستغلال، وقرى الأطفال SOS مصممة على منع ذلك.",
-    "youth.title": "مشاركة الشباب في الحماية",
-    "youth.text1": "يحق للأطفال والشباب أن يكونوا جزءًا من كل ما يؤثر عليهم، خاصة عندما يتعلق الأمر بالبقاء آمنًا والقرارات التي تؤثر على حياتهم. من المهم بالنسبة لهم أن يعرفوا حقوقهم، وأن يفهموا كيف تحافظ قرى الأطفال SOS على سلامتهم، وأن يكونوا على دراية بطرق الإبلاغ والحصول على المساعدة إذا احتاجوا إليها.",
-    "youth.text2": "إنهم يعتقدون أن الأطفال والشباب هم الخبراء الحقيقيون في حياتهم الخاصة، لذلك يريدون أن يسمعوا ما ستقوله حول ما قد يكون محفوفًا بالمخاطر أو كيف يمكن تحسين الأمور. عندما يكون الأطفال والشباب جزءًا من خلق بيئة آمنة، فإن ذلك يساعد قرى الأطفال SOS على القيام بعمل أفضل في فهم الاحتياجات والتأكد من أن برامجهم تعمل بشكل جيد. بهذه الطريقة، يمكن للجميع الحصول على مكان آمن وداعم لينمو.",
-    "cards.intro": "بعض الطرق التي يمكنك من خلالها المشاركة والمشاركة في حماية حقوقهم وزيادة الوعي بها هي:",
-    "cta.title": "من حقك أن تكوني بأمان.",
-    "cta.text": "إذا تعرضت للإساءة أو الإهمال، فأبلغ عن ذلك.",
-    "cta.button": "الإبلاغ عن مخاوف تتعلق بالسلامة",
-    "footer.copyright": "حقوق النشر",
-    "footer.rights": "جميع الحقوق محفوظة"
-  },
-  pt: {
-    "nav.home": "Início",
-    "nav.rights": "Os seus direitos",
-    "nav.preventing": "Prevenção de abusos",
-    "nav.reporting": "Denúncia de abusos",
-    "nav.cyber": "Proteção cibernética",
-    "nav.report": "Relatar Preocupação",
-    "nav.privacy": "Política de privacidade",
-    "page.title": "Os seus direitos",
-    "intro.title": "Introdução",
-    "intro.text1": "Vamos começar por falar dos seus direitos! Todas as crianças do mundo têm alguns direitos especiais, e todos eles estão definidos numa coisa chamada \"Convenção das Nações Unidas sobre os Direitos da Criança\". É como uma grande promessa de muitos países de que irão garantir a proteção dos direitos da criança.",
-    "intro.text2": "Todos estes direitos são muito importantes e ninguém os pode retirar às crianças. Isso significa que têm o direito de estar seguros e protegidos de tudo o que os possa prejudicar, como maus tratos, negligência ou aproveitamento. As Aldeias de Crianças SOS estão empenhadas em defender estes direitos das crianças e dos jovens.",
-    "general.title": "Informações gerais",
-    "general.lead": "Sobre os direitos das crianças e dos jovens a permanecerem seguros e o dever das Aldeias de Crianças SOS",
-    "general.text1": "As Aldeias de Crianças SOS estão empenhadas em proteger os direitos das crianças e em criar um local seguro e de apoio onde as crianças e os jovens possam construir relações fortes e de confiança e ser o melhor que podem ser. As Aldeias de Crianças SOS apresentam tudo o que prometem fazer para manter as crianças e os jovens em segurança num documento denominado \"Política de Salvaguarda de Crianças e Jovens\".",
-    "general.text2": "A proteção de crianças e jovens tem a ver com o facto de as Aldeias de Crianças SOS se certificarem de que tomam todas as medidas possíveis para evitar que os seus funcionários, todos os que trabalham com eles e todos os seus programas façam algo que possa magoar crianças e jovens ou colocá-los em risco. E se algo correr mal, prometem resolver o problema da forma correcta. Os danos podem resultar de situações como abuso, negligência ou aproveitamento, e a Aldeias de Crianças SOS está determinada a evitá-los.",
-    "youth.title": "Participação dos jovens na proteção",
-    "youth.text1": "As crianças e os jovens têm o direito de participar em tudo o que os afecta, especialmente quando se trata de se manterem seguros e das decisões que afectam as suas vidas. É importante que conheçam os seus direitos, compreendam como as Aldeias de Crianças SOS os mantêm seguros e estejam cientes das formas de denunciar e obter ajuda, caso necessitem.",
-    "youth.text2": "Acreditam que as crianças e os jovens são os verdadeiros especialistas nas suas próprias vidas, por isso querem ouvir o que têm a dizer sobre o que pode ser arriscado ou como as coisas podem ser melhoradas. Quando as crianças e os jovens fazem parte da criação de um ambiente seguro, isso ajuda as Aldeias de Crianças SOS a fazer um melhor trabalho na compreensão das necessidades e a garantir que os seus programas funcionam bem. Desta forma, todos podem ter um lugar seguro e solidário para crescer.",
-    "cards.title": "Cartões didácticos",
-    "cards.intro": "Algumas formas de se envolver e participar na proteção e sensibilização para os seus direitos são",
-    "cta.title": "Tem o direito de estar em segurança.",
-    "cta.text": "Se tiver sido vítima de abuso ou negligência, comunique-o.",
-    "cta.button": "COMUNICAR UM PROBLEMA DE SEGURANÇA",
-    "footer.copyright": "Copyright",
-    "footer.rights": "Todos os direitos reservados"
-  },
-  ru: {
-    "nav.home": "Главная",
-    "nav.rights": "Ваши права",
-    "nav.preventing": "Предотвращение злоупотреблений",
-    "nav.reporting": "Сообщение о злоупотреблениях",
-    "nav.cyber": "Кибербезопасность",
-    "nav.report": "Сообщить о проблеме",
-    "nav.privacy": "Политика конфиденциальности",
-    "page.title": "Ваши права",
-    "intro.title": "Введение",
-    "intro.text1": "Давайте начнем с разговора о ваших правах! У каждого ребенка в мире есть особые права, и все они прописаны в так называемой \"Конвенции ООН о правах ребенка\". Это похоже на обещание многих стран обеспечить защиту прав ребенка.",
-    "intro.text2": "Все эти права очень важны, и никто не может отнять их у детей. Это означает, что вы имеете право на безопасность и защиту от всего, что может причинить им вред, например от жестокого обращения, пренебрежения или использования в своих интересах. Организация \"Детские деревни - SOS\" привержена соблюдению этих прав детей и подростков.",
-    "general.title": "Общая информация",
-    "general.lead": "О правах детей и подростков на безопасность и обязанностях Детских деревень - SOS",
-    "general.text1": "SOS Детские деревни\" стремится защищать права детей и создавать безопасное и благоприятное место, где дети и подростки могут строить крепкие, надежные отношения и быть лучшими, какими они могут быть. В документе под названием \"Политика защиты детей и молодежи\" SOS Children's Villages излагает все, что они обещают сделать для обеспечения безопасности детей и подростков.",
-    "general.text2": "Защита детей и молодежи - это забота о том, чтобы SOS Children's Villages принимал все возможные меры для того, чтобы их сотрудники, все, кто с ними работает, и все их программы не делали ничего, что может навредить детям и подросткам или подвергнуть их риску. А если что-то пойдет не так, они обещают разобраться с этим должным образом. Вред может быть причинен такими вещами, как жестокое обращение, пренебрежение или использование в своих интересах, и организация \"Детские деревни - SOS\" намерена предотвратить его.",
-    "youth.title": "Участие молодежи в охране",
-    "youth.text1": "Дети и подростки имеют право принимать участие во всем, что их касается, особенно когда речь идет о безопасности и решениях, влияющих на их жизнь. Важно, чтобы они знали свои права, понимали, как SOS Детские деревни обеспечивает их безопасность, и были осведомлены о том, как сообщить о случившемся и получить помощь, если она им понадобится.",
-    "youth.text2": "Они считают, что дети и подростки - настоящие эксперты в своей собственной жизни, поэтому хотят услышать, что вы можете сказать о том, что может быть рискованным или как можно улучшить ситуацию. Когда дети и подростки участвуют в создании безопасной среды, это помогает Детским деревням - SOS лучше понять потребности и обеспечить эффективную работу своих программ. Таким образом, у каждого будет безопасное и благоприятное место для взросления.",
-    "cards.intro": "Вот некоторые способы, с помощью которых вы можете принять участие в защите и повышении осведомленности об их правах:",
-    "cta.title": "Вы имеете право на безопасность.",
-    "cta.text": "Если вы подверглись насилию или пренебрежению, сообщите об этом.",
-    "cta.button": "СООБЩИТЬ О ПРОБЛЕМЕ БЕЗОПАСНОСТИ",
-    "footer.copyright": "Copyright",
-    "footer.rights": "Все права защищены"
+/* Page settings and this page's translations (es, fr, ar, pt, ru). Navigation, footer and interface text
+   are shared and live in site.js. REVIEW: closing message realigned with the current English (official terminology, 25 Nov 2026); the rest are the approved WordPress translations. cards.title (fr, ar, ru) added. */
+window.STAYSAFE_PAGE = {
+  titleKey: "page.title",
+  descKey: "general.lead",
+  video: "your-rights-banner",
+  translations: {
+    "es": {
+      "page.title": "Sus derechos",
+      "intro.title": "Introducción",
+      "intro.text1": "Empecemos hablando de tus derechos. Todos los niños del mundo tienen algunos derechos especiales, y todos ellos están recogidos en algo llamado \"Convención de las Naciones Unidas sobre los Derechos del Niño\". Es como una gran promesa de muchos países de que velarán por la protección de los derechos de la infancia.",
+      "intro.text2": "Todos estos derechos son importantísimos, y nadie puede quitárselos a los niños. Eso significa que tiene derecho a estar seguro y protegido de cualquier cosa que pueda perjudicarle, como malos tratos, abandono o que se aprovechen de él. Aldeas Infantiles SOS se compromete a defender estos derechos de niños y jóvenes.",
+      "general.title": "Información general",
+      "general.lead": "El derecho de los niños y jóvenes a estar seguros y el deber de Aldeas Infantiles SOS",
+      "general.text1": "Aldeas Infantiles SOS se compromete a proteger los derechos de los niños y a crear un lugar seguro y de apoyo donde los niños y los jóvenes puedan establecer relaciones sólidas y de confianza y dar lo mejor de sí mismos. Aldeas Infantiles SOS expone todo lo que se compromete a hacer para mantener a salvo a niños y jóvenes en un documento llamado \"Política de protección de la infancia y la juventud\".",
+      "general.text2": "La protección de la infancia y la juventud consiste en que Aldeas Infantiles SOS se asegure de tomar todas las medidas posibles para evitar que su personal, todos los que trabajan con ellos y todos sus programas hagan algo que pueda perjudicar a los niños y jóvenes o ponerlos en peligro. Y si algo sale mal, prometen solucionarlo de la forma adecuada. El daño puede venir de cosas como el abuso, el abandono o que se aprovechen de ti, y Aldeas Infantiles SOS está decidida a evitarlo.",
+      "youth.title": "Participación de los jóvenes en la salvaguardia",
+      "youth.text1": "Los niños y jóvenes tienen derecho a participar en todo lo que les afecta, especialmente cuando se trata de mantenerse seguros y de tomar decisiones que afectan a sus vidas. Es importante que conozcan sus derechos, que sepan cómo Aldeas Infantiles SOS los mantiene a salvo y que conozcan las formas de denunciar y obtener ayuda si la necesitan.",
+      "youth.text2": "Creen que los niños y los jóvenes son los verdaderos expertos en sus propias vidas, por lo que quieren escuchar lo que tienen que decir sobre lo que puede ser arriesgado o cómo se pueden mejorar las cosas. Cuando los niños y los jóvenes participan en la creación de un entorno seguro, ayudan a Aldeas Infantiles SOS a comprender mejor las necesidades y a garantizar el buen funcionamiento de sus programas. De este modo, todos pueden tener un lugar seguro y solidario donde crecer.",
+      "cards.title": "Tarjetas educativas",
+      "cards.intro": "Algunas formas de implicarse y participar en la protección y concienciación sobre sus derechos son:",
+      "cta.title": "Tienes derecho a estar seguro.",
+      "cta.text": "Si has sufrido o presenciado malos tratos, abandono u otra situación que afecte a tu protección, tienes derecho a pedir ayuda y a denunciar lo ocurrido.",
+      "cta.button": "NOTIFICAR UN PROBLEMA DE SEGURIDAD"
+    },
+    "fr": {
+      "page.title": "Vos droits",
+      "intro.title": "Introduction",
+      "intro.text1": "Commençons par parler de vos droits ! Chaque enfant dans le monde a des droits particuliers, qui sont énoncés dans la \"Convention des Nations unies relative aux droits de l'enfant\". C'est comme une grande promesse faite par de nombreux pays de veiller à ce que les droits de l'enfant soient protégés.",
+      "intro.text2": "Tous ces droits sont très importants et personne ne peut les retirer aux enfants. Cela signifie que vous avez le droit d'être en sécurité et protégé contre tout ce qui pourrait lui nuire, comme la maltraitance, la négligence ou les abus. SOS Villages d'Enfants s'engage à faire respecter ces droits pour les enfants et les jeunes.",
+      "general.title": "Informations générales",
+      "general.lead": "Le droit des enfants et des jeunes à la sécurité et le devoir de SOS Villages d'Enfants",
+      "general.text1": "SOS Villages d'Enfants s'engage à protéger les droits des enfants et à créer un lieu sûr et solidaire où les enfants et les jeunes peuvent établir des relations solides et de confiance et donner le meilleur d'eux-mêmes. SOS Villages d'Enfants présente tout ce qu'elle s'engage à faire pour assurer la sécurité des enfants et des jeunes dans un document intitulé \"Child and Youth Safeguarding Policy\" (Politique de sauvegarde des enfants et des jeunes).",
+      "general.text2": "La protection des enfants et des jeunes consiste pour SOS Villages d'Enfants à s'assurer qu'ils prennent toutes les mesures possibles pour empêcher leur personnel, toutes les personnes qui travaillent avec eux et tous leurs programmes de faire quoi que ce soit qui puisse blesser les enfants et les jeunes ou les mettre en danger. Et si quelque chose ne va pas, ils promettent d'y remédier de manière appropriée. Le préjudice peut résulter d'abus, de négligence ou d'exploitation, et SOS Villages d'Enfants est déterminé à l'éviter.",
+      "youth.title": "La participation des jeunes à la sauvegarde",
+      "youth.text1": "Les enfants et les jeunes ont le droit de participer à tout ce qui les concerne, en particulier lorsqu'il s'agit de rester en sécurité et de prendre des décisions qui affectent leur vie. Il est important qu'ils connaissent leurs droits, qu'ils comprennent comment SOS Villages d'Enfants assure leur sécurité et qu'ils sachent comment signaler un cas et obtenir de l'aide s'ils en ont besoin.",
+      "youth.text2": "Ils sont convaincus que les enfants et les jeunes sont les véritables experts de leur propre vie. Ils veulent donc entendre ce que vous avez à dire sur ce qui pourrait être risqué ou sur la manière dont les choses pourraient être améliorées. Lorsque les enfants et les jeunes participent à la création d'un environnement sûr, SOS Villages d'Enfants est mieux à même de comprendre les besoins et de veiller au bon fonctionnement de ses programmes. De cette manière, tout le monde peut disposer d'un endroit sûr et favorable pour grandir.",
+      "cards.intro": "Voici quelques moyens de s'impliquer et de participer à la protection et à la sensibilisation aux droits de ces personnes :",
+      "cta.title": "Vous avez le droit d'être en sécurité.",
+      "cta.text": "Si vous avez subi ou été témoin d’abus, de négligence ou d’une autre situation qui menace votre protection, vous avez le droit de demander de l’aide et de signaler ce qui s’est passé.",
+      "cta.button": "SIGNALER UN PROBLÈME DE SÉCURITÉ",
+      "cards.title": "Cartes éducatives"
+    },
+    "ar": {
+      "page.title": "حقوقك",
+      "intro.title": "مقدمة",
+      "intro.text1": "دعونا نبدأ الأمور بالحديث عن حقوقك! يتمتع كل طفل حول العالم ببعض الحقوق الخاصة، وكلها منصوص عليها في ما يسمى \"اتفاقية الأمم المتحدة لحقوق الطفل\". إنه بمثابة وعد كبير من العديد من البلدان بأنها سوف تتأكد من حماية حقوق الطفل.",
+      "intro.text2": "كل هذه الحقوق مهمة للغاية، ولا يمكن لأحد أن ينتزعها من الأطفال. وهذا يعني أن لديك الحق في أن تكون آمنًا ومحميًا من أي شيء يمكن أن يؤذيهم، مثل الإساءة أو الإهمال أو الاستغلال. تلتزم قرى الأطفال SOS بدعم هذه الحقوق للأطفال والشباب.",
+      "general.title": "معلومات عامة",
+      "general.lead": "حول حقوق الأطفال واليافعين في البقاء آمنين وواجب قرى الأطفال SOS",
+      "general.text1": "تلتزم قرى الأطفال SOS بحماية حقوق الأطفال وإنشاء مكان آمن وداعم حيث يمكن للأطفال والشباب بناء علاقات قوية وجديرة بالثقة وأن يكونوا في أفضل حالاتهم. تحدد قرى الأطفال SOS كل ما وعدت بفعله للحفاظ على سلامة الأطفال والشباب في وثيقة تسمى \"سياسة حماية الأطفال والشباب\".",
+      "general.text2": "إن حماية الأطفال والشباب تدور حول قيام قرى الأطفال SOS بالتأكد من اتخاذ كل خطوة ممكنة للحفاظ على موظفيها وكل من يعمل معهم وجميع برامجهم من القيام بأي شيء قد يؤذي الأطفال والشباب أو يعرضهم للخطر. وإذا حدث خطأ ما، فإنهم يعدون بالتعامل معه بالطريقة الصحيحة. يمكن أن يأتي الضرر من أشياء مثل سوء المعاملة أو الإهمال أو الاستغلال، وقرى الأطفال SOS مصممة على منع ذلك.",
+      "youth.title": "مشاركة الشباب في الحماية",
+      "youth.text1": "يحق للأطفال والشباب أن يكونوا جزءًا من كل ما يؤثر عليهم، خاصة عندما يتعلق الأمر بالبقاء آمنًا والقرارات التي تؤثر على حياتهم. من المهم بالنسبة لهم أن يعرفوا حقوقهم، وأن يفهموا كيف تحافظ قرى الأطفال SOS على سلامتهم، وأن يكونوا على دراية بطرق الإبلاغ والحصول على المساعدة إذا احتاجوا إليها.",
+      "youth.text2": "إنهم يعتقدون أن الأطفال والشباب هم الخبراء الحقيقيون في حياتهم الخاصة، لذلك يريدون أن يسمعوا ما ستقوله حول ما قد يكون محفوفًا بالمخاطر أو كيف يمكن تحسين الأمور. عندما يكون الأطفال والشباب جزءًا من خلق بيئة آمنة، فإن ذلك يساعد قرى الأطفال SOS على القيام بعمل أفضل في فهم الاحتياجات والتأكد من أن برامجهم تعمل بشكل جيد. بهذه الطريقة، يمكن للجميع الحصول على مكان آمن وداعم لينمو.",
+      "cards.intro": "بعض الطرق التي يمكنك من خلالها المشاركة والمشاركة في حماية حقوقهم وزيادة الوعي بها هي:",
+      "cta.title": "من حقك أن تكون آمناً.",
+      "cta.text": "إذا تعرّضت للإساءة أو الإهمال أو لأي مشكلة أخرى تتعلق بالحماية، أو شهدت ذلك، فمن حقك أن تطلب المساعدة وأن تبلغ عمّا حدث.",
+      "cta.button": "الإبلاغ عن مخاوف تتعلق بالسلامة",
+      "cards.title": "بطاقات تعليمية"
+    },
+    "pt": {
+      "page.title": "Os seus direitos",
+      "intro.title": "Introdução",
+      "intro.text1": "Vamos começar por falar dos seus direitos! Todas as crianças do mundo têm alguns direitos especiais, e todos eles estão definidos numa coisa chamada \"Convenção das Nações Unidas sobre os Direitos da Criança\". É como uma grande promessa de muitos países de que irão garantir a proteção dos direitos da criança.",
+      "intro.text2": "Todos estes direitos são muito importantes e ninguém os pode retirar às crianças. Isso significa que têm o direito de estar seguros e protegidos de tudo o que os possa prejudicar, como maus tratos, negligência ou aproveitamento. As Aldeias de Crianças SOS estão empenhadas em defender estes direitos das crianças e dos jovens.",
+      "general.title": "Informações gerais",
+      "general.lead": "Sobre os direitos das crianças e dos jovens a permanecerem seguros e o dever das Aldeias de Crianças SOS",
+      "general.text1": "As Aldeias de Crianças SOS estão empenhadas em proteger os direitos das crianças e em criar um local seguro e de apoio onde as crianças e os jovens possam construir relações fortes e de confiança e ser o melhor que podem ser. As Aldeias de Crianças SOS apresentam tudo o que prometem fazer para manter as crianças e os jovens em segurança num documento denominado \"Política de Salvaguarda de Crianças e Jovens\".",
+      "general.text2": "A proteção de crianças e jovens tem a ver com o facto de as Aldeias de Crianças SOS se certificarem de que tomam todas as medidas possíveis para evitar que os seus funcionários, todos os que trabalham com eles e todos os seus programas façam algo que possa magoar crianças e jovens ou colocá-los em risco. E se algo correr mal, prometem resolver o problema da forma correcta. Os danos podem resultar de situações como abuso, negligência ou aproveitamento, e a Aldeias de Crianças SOS está determinada a evitá-los.",
+      "youth.title": "Participação dos jovens na proteção",
+      "youth.text1": "As crianças e os jovens têm o direito de participar em tudo o que os afecta, especialmente quando se trata de se manterem seguros e das decisões que afectam as suas vidas. É importante que conheçam os seus direitos, compreendam como as Aldeias de Crianças SOS os mantêm seguros e estejam cientes das formas de denunciar e obter ajuda, caso necessitem.",
+      "youth.text2": "Acreditam que as crianças e os jovens são os verdadeiros especialistas nas suas próprias vidas, por isso querem ouvir o que têm a dizer sobre o que pode ser arriscado ou como as coisas podem ser melhoradas. Quando as crianças e os jovens fazem parte da criação de um ambiente seguro, isso ajuda as Aldeias de Crianças SOS a fazer um melhor trabalho na compreensão das necessidades e a garantir que os seus programas funcionam bem. Desta forma, todos podem ter um lugar seguro e solidário para crescer.",
+      "cards.title": "Cartões didácticos",
+      "cards.intro": "Algumas formas de se envolver e participar na proteção e sensibilização para os seus direitos são",
+      "cta.title": "Tem o direito de estar em segurança.",
+      "cta.text": "Se sofreu ou presenciou abuso, negligência ou outra situação que ponha em causa a sua proteção, tem o direito de pedir ajuda e de comunicar o que aconteceu.",
+      "cta.button": "COMUNICAR UM PROBLEMA DE SEGURANÇA"
+    },
+    "ru": {
+      "page.title": "Ваши права",
+      "intro.title": "Введение",
+      "intro.text1": "Давайте начнем с разговора о ваших правах! У каждого ребенка в мире есть особые права, и все они прописаны в так называемой \"Конвенции ООН о правах ребенка\". Это похоже на обещание многих стран обеспечить защиту прав ребенка.",
+      "intro.text2": "Все эти права очень важны, и никто не может отнять их у детей. Это означает, что вы имеете право на безопасность и защиту от всего, что может причинить им вред, например от жестокого обращения, пренебрежения или использования в своих интересах. Организация \"Детские деревни - SOS\" привержена соблюдению этих прав детей и подростков.",
+      "general.title": "Общая информация",
+      "general.lead": "О правах детей и подростков на безопасность и обязанностях Детских деревень - SOS",
+      "general.text1": "SOS Детские деревни\" стремится защищать права детей и создавать безопасное и благоприятное место, где дети и подростки могут строить крепкие, надежные отношения и быть лучшими, какими они могут быть. В документе под названием \"Политика защиты детей и молодежи\" SOS Children's Villages излагает все, что они обещают сделать для обеспечения безопасности детей и подростков.",
+      "general.text2": "Защита детей и молодежи - это забота о том, чтобы SOS Children's Villages принимал все возможные меры для того, чтобы их сотрудники, все, кто с ними работает, и все их программы не делали ничего, что может навредить детям и подросткам или подвергнуть их риску. А если что-то пойдет не так, они обещают разобраться с этим должным образом. Вред может быть причинен такими вещами, как жестокое обращение, пренебрежение или использование в своих интересах, и организация \"Детские деревни - SOS\" намерена предотвратить его.",
+      "youth.title": "Участие молодежи в охране",
+      "youth.text1": "Дети и подростки имеют право принимать участие во всем, что их касается, особенно когда речь идет о безопасности и решениях, влияющих на их жизнь. Важно, чтобы они знали свои права, понимали, как SOS Детские деревни обеспечивает их безопасность, и были осведомлены о том, как сообщить о случившемся и получить помощь, если она им понадобится.",
+      "youth.text2": "Они считают, что дети и подростки - настоящие эксперты в своей собственной жизни, поэтому хотят услышать, что вы можете сказать о том, что может быть рискованным или как можно улучшить ситуацию. Когда дети и подростки участвуют в создании безопасной среды, это помогает Детским деревням - SOS лучше понять потребности и обеспечить эффективную работу своих программ. Таким образом, у каждого будет безопасное и благоприятное место для взросления.",
+      "cards.intro": "Вот некоторые способы, с помощью которых вы можете принять участие в защите и повышении осведомленности об их правах:",
+      "cta.title": "Вы имеете право на безопасность.",
+      "cta.text": "Если вы подверглись насилию, пренебрежению или другой угрозе безопасности либо стали их свидетелем, вы имеете право обратиться за помощью и сообщить о случившемся.",
+      "cta.button": "СООБЩИТЬ О ПРОБЛЕМЕ БЕЗОПАСНОСТИ",
+      "cards.title": "Обучающие карточки"
+    }
   }
 };
-
-const LANGUAGES = {
-  en: { htmlLang: 'en',    dir: 'ltr', ogLocale: 'en_GB' },
-  es: { htmlLang: 'es',    dir: 'ltr', ogLocale: 'es_ES' },
-  fr: { htmlLang: 'fr',    dir: 'ltr', ogLocale: 'fr_FR' },
-  ar: { htmlLang: 'ar',    dir: 'rtl', ogLocale: 'ar_AR' },
-  pt: { htmlLang: 'pt-PT', dir: 'ltr', ogLocale: 'pt_PT' },
-  ru: { htmlLang: 'ru',    dir: 'ltr', ogLocale: 'ru_RU' }
-};
-const STORAGE_KEY = 'sos-staysafe-lang';   // shared by every page of the site
-const SITE_NAME = 'SOS StaySafe';
-const PAGE_VIDEO = 'your-rights-banner';  // Videos/your-rights-banner-{lang}.mp4
+</script>
+<script src="site.js?v=2026-11-25"></script>
+<script>
 /* Educational cards: the Genially module embedded on each language version of the original page.
    The Spanish and Portuguese pages used the English module; no translated module is in the XML. */
-const CARD_MODULES = {
-  en: '65ee82c7b4108300146d70e3',
-  es: '65ee82c7b4108300146d70e3',
-  fr: '6669d636b9dac5001472a0fe',
-  ar: '6669d9f6c11b8c0014381a31',
-  pt: '65ee82c7b4108300146d70e3',
-  ru: '6669d9fdb9dac50014769eb7'
-};
-const ENGLISH = {                         // completed from the HTML by captureEnglish()
-  'ui.play': 'Play animations',            // labels that only appear after an interaction
-  'ui.closeMenu': 'Close menu'
-};
-let currentLang = 'en';
-
-/** Read the English text and attribute values already in the page. */
-function captureEnglish() {
-  document.querySelectorAll('[data-i18n]').forEach(function (el) {
-    ENGLISH[el.dataset.i18n] = el.textContent.trim();
-  });
-  document.querySelectorAll('[data-i18n-attr]').forEach(function (el) {
-    const [attr, key] = el.dataset.i18nAttr.split(':');
-    ENGLISH[key] = el.getAttribute(attr);
-  });
-}
-
-/** Text for a key in a language; reports whether English had to be used instead. */
-function translate(key, lang) {
-  const own = lang !== 'en' && TRANSLATIONS[lang] && TRANSLATIONS[lang][key];
-  return own ? { text: own, fallback: false } : { text: ENGLISH[key], fallback: lang !== 'en' };
-}
-
-/** Mark English fallback text so screen readers pronounce it correctly. */
-function markFallback(el, fallback) {
-  if (fallback) { el.lang = 'en'; el.dir = 'ltr'; }
-  else { el.removeAttribute('lang'); el.removeAttribute('dir'); }
-}
-
-/** Replace every translatable text and attribute on the page. */
-function applyTranslations(lang) {
-  document.querySelectorAll('[data-i18n]').forEach(function (el) {
-    const t = translate(el.dataset.i18n, lang);
-    el.textContent = t.text;
-    markFallback(el, t.fallback);
-  });
-  document.querySelectorAll('[data-i18n-attr]').forEach(function (el) {
-    const [attr, key] = el.dataset.i18nAttr.split(':');
-    el.setAttribute(attr, translate(key, lang).text);
-  });
-}
-
-/** Language, direction and metadata on the <html> element and in <head>. */
-function applyDocumentLanguage(lang) {
-  const root = document.documentElement;
-  root.lang = LANGUAGES[lang].htmlLang;
-  root.dir = LANGUAGES[lang].dir;
-  root.dataset.lang = lang;
-  document.title = translate('page.title', lang).text + ' | ' + SITE_NAME;
-  document.querySelector('meta[name="description"]').setAttribute('content', translate('general.lead', lang).text);
-  document.querySelector('meta[property="og:locale"]').setAttribute('content', LANGUAGES[lang].ogLocale);
-}
-
-/* ---------- 2. Language selection ---------- */
-function saveLanguage(lang) {
-  try { localStorage.setItem(STORAGE_KEY, lang); } catch (e) { /* storage blocked */ }
-}
-
-/** Keep ?lang= in the address so the current view can be shared; English needs none. */
-function updateAddress(lang) {
-  try {
-    const url = new URL(location.href);
-    if (lang === 'en') url.searchParams.delete('lang'); else url.searchParams.set('lang', lang);
-    history.replaceState(null, '', url);
-  } catch (e) { /* some file:// contexts refuse; nothing else depends on it */ }
-}
-
-function updateLanguageControls(lang) {
-  document.getElementById('lang-select').value = lang;
-  document.querySelectorAll('.footer-langs button').forEach(function (btn) {
-    btn.setAttribute('aria-pressed', String(btn.dataset.lang === lang));
-  });
-}
-
-function setLanguage(lang) {
-  if (!LANGUAGES[lang]) throw new Error('Unsupported language: ' + lang);
-  currentLang = lang;
-  applyTranslations(lang);
-  applyDocumentLanguage(lang);
-  updateLanguageControls(lang);
-  updateMotionLabel();
-  saveLanguage(lang);
-  updateAddress(lang);
-  onLanguageChangeVideo();
-  selectCardModule(lang);
-}
-
-/** Show the educational-card module for the selected language. */
-function selectCardModule(lang) {
+const CARD_MODULES = { en: '65ee82c7b4108300146d70e3', es: '65ee82c7b4108300146d70e3', fr: '6669d636b9dac5001472a0fe',
+  ar: '6669d9f6c11b8c0014381a31', pt: '65ee82c7b4108300146d70e3', ru: '6669d9fdb9dac50014769eb7' };
+StaySafe.onLanguageChange(function (lang) {
   const frame = document.getElementById('cards-frame');
   const url = 'https://view.genially.com/' + CARD_MODULES[lang];
   if (frame.getAttribute('src') !== url) frame.setAttribute('src', url);
-}
-
-/** Outline the cards frame while focus is inside it. */
-const cardsFrame = document.getElementById('cards-frame');
-window.addEventListener('blur', function () {
-  setTimeout(function () { cardsFrame.parentElement.classList.toggle('has-focus', document.activeElement === cardsFrame); });
 });
-window.addEventListener('focus', function () { cardsFrame.parentElement.classList.remove('has-focus'); });
-
-/* ---------- 3. Hero video and animated illustrations ---------- */
-const video = document.getElementById('hero-video');
-const motionToggle = document.getElementById('motion-toggle');
-const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-const saveDataOn = document.documentElement.classList.contains('save-data');
-let motionOn = !(reducedMotion.matches || saveDataOn);
-
-function videoUrl(lang) { return 'Videos/' + PAGE_VIDEO + '-' + lang + '.mp4'; }
-
-function playVideo() {
-  const url = videoUrl(currentLang);
-  if (video.getAttribute('src') !== url) video.setAttribute('src', url);
-  const attempt = video.play();
-  if (attempt) attempt.catch(function (err) {
-    if (err.name === 'NotAllowedError') setMotion(false);   // autoplay refused by the browser
-  });
-}
-
-/** Remove the source so the static poster shows again. */
-function clearVideo() {
-  video.pause();
-  video.removeAttribute('src');
-  video.load();
-}
-
-/** Swap to the new language's video, but only once the video has been started. */
-function onLanguageChangeVideo() {
-  if (!video.getAttribute('src')) return;
-  if (motionOn) playVideo(); else clearVideo();
-}
-
-/** Freeze an animated GIF on its current frame by drawing it on a canvas. */
-function freezeGif(img) {
-  if (img.hidden || !img.complete || !img.naturalWidth) return;
-  const canvas = document.createElement('canvas');
-  canvas.width = img.naturalWidth;
-  canvas.height = img.naturalHeight;
-  canvas.getContext('2d').drawImage(img, 0, 0);
-  canvas.setAttribute('aria-hidden', 'true');
-  img.after(canvas);
-  img.hidden = true;
-}
-
-function unfreezeGif(img) {
-  if (!img.hidden) return;
-  img.nextElementSibling.remove();
-  img.hidden = false;
-}
-
-function updateMotionLabel() {
-  const t = translate(motionOn ? 'ui.pause' : 'ui.play', currentLang);
-  motionToggle.setAttribute('aria-label', t.text);
-  motionToggle.setAttribute('aria-pressed', String(!motionOn));
-  markFallback(motionToggle, t.fallback);
-}
-
-/** One control for all motion on the page: the hero video and the animated illustrations. */
-function setMotion(on) {
-  motionOn = on;
-  updateMotionLabel();
-  document.querySelectorAll('img.anim').forEach(on ? unfreezeGif : freezeGif);
-  if (on) playVideo(); else video.pause();
-}
-
-video.addEventListener('error', function () {
-  console.warn('Homepage video could not be loaded: ' + video.getAttribute('src') + '. Showing the static image instead.');
-  video.removeAttribute('src');
-  video.load();
-});
-motionToggle.addEventListener('click', function () { setMotion(!motionOn); });
-reducedMotion.addEventListener('change', function (e) { if (e.matches) setMotion(false); });
-document.querySelectorAll('img.anim').forEach(function (img) {
-  img.addEventListener('load', function () { if (!motionOn) freezeGif(img); });
-});
-
-/* ---------- 4. Mobile navigation ---------- */
-const navToggle = document.querySelector('.nav-toggle');
-const navPanel = document.getElementById('nav-panel');
-
-function setMenu(open) {
-  navToggle.setAttribute('aria-expanded', String(open));
-  navPanel.classList.toggle('is-open', open);
-  const t = translate(open ? 'ui.closeMenu' : 'ui.menu', currentLang);
-  navToggle.setAttribute('aria-label', t.text);
-  markFallback(navToggle, t.fallback);
-}
-
-navToggle.addEventListener('click', function () {
-  setMenu(navToggle.getAttribute('aria-expanded') !== 'true');
-});
-document.addEventListener('keydown', function (e) {
-  if (e.key === 'Escape' && navToggle.getAttribute('aria-expanded') === 'true') {
-    setMenu(false);
-    navToggle.focus();
-  }
-});
-window.matchMedia('(min-width: 1100px)').addEventListener('change', function () { setMenu(false); });
-
-/* ---------- Start ---------- */
-captureEnglish();
-document.getElementById('year').textContent = new Date().getFullYear();
-document.getElementById('lang-select').addEventListener('change', function (e) { setLanguage(e.target.value); });
-document.querySelectorAll('.footer-langs button').forEach(function (btn) {
-  btn.addEventListener('click', function () { setLanguage(btn.dataset.lang); });
-});
-setLanguage(document.documentElement.dataset.lang || 'en');
-updateMotionLabel();
-/* Start the video only after the rest of the page has loaded, so it never delays the content. */
-window.addEventListener('load', function () { if (motionOn) playVideo(); });
 </script>
 </body>
 </html>
-

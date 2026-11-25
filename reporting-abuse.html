@@ -5,9 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Reporting Abuse | SOS StaySafe</title>
 <meta name="description" content="Where and how children and young people can report abuse, what to share, what happens after a report, and what to do if a report is not taken seriously.">
-<!-- Legacy WordPress address: https://sos-staysafe.com/how-to-report-what-happens-after-you-report/ (needs a redirect to this page at deployment) -->
 <link rel="canonical" href="https://sos-staysafe.com/reporting-abuse.html">
 <link rel="icon" type="image/png" href="Images/favicon.png">
+<link rel="apple-touch-icon" href="Images/apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#1c325d">
 
 <!-- Open Graph (link previews) -->
@@ -25,18 +26,19 @@
 <meta property="og:locale:alternate" content="ru_RU">
 
 <script>
-  /* Runs before the page is drawn: marks JavaScript as available and applies the
-     visitor's language direction early, so Arabic does not flash left-to-right.
-     Order of precedence: ?lang= in the address, then the saved choice, then English. */
+  /* Runs before the page is drawn: marks JavaScript as available and applies the visitor's language and
+     direction early, so Arabic never flashes left-to-right. Order of precedence: ?lang= in the address,
+     then the language chosen earlier on this site, then the browser's preferred languages, then English. */
   (function () {
     var supported = ['en', 'es', 'fr', 'ar', 'pt', 'ru'];
-    var lang = 'en';
-    try {
-      var fromUrl = (new URLSearchParams(location.search).get('lang') || '').toLowerCase();
-      var saved = localStorage.getItem('sos-staysafe-lang');
-      if (supported.indexOf(fromUrl) > -1) lang = fromUrl;
-      else if (supported.indexOf(saved) > -1) lang = saved;
-    } catch (e) { /* storage blocked: stay with English */ }
+    function pick(code) { var p = String(code || '').toLowerCase().split('-')[0]; return supported.indexOf(p) > -1 ? p : null; }
+    var lang = null;
+    try { lang = pick(new URLSearchParams(location.search).get('lang')) || pick(localStorage.getItem('sos-staysafe-lang')); } catch (e) { /* storage blocked */ }
+    if (!lang) {
+      var prefs = navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language];
+      for (var i = 0; i < prefs.length && !lang; i++) lang = pick(prefs[i]);
+    }
+    lang = lang || 'en';
     var root = document.documentElement;
     root.classList.add('js');
     root.dataset.lang = lang;
@@ -44,227 +46,10 @@
     if (navigator.connection && navigator.connection.saveData) root.classList.add('save-data');
   })();
 </script>
-
+<link rel="stylesheet" href="site.css?v=2026-11-25">
 <style>
-/* =====================================================================
-   SOS StaySafe — shared styles (same design system as index.html; page-specific rules are marked)
-   Colours: SOS Brand Blue #00abec and Red #de5a6c (SOS brand guide);
-   navy #1c325d and text #212934 (existing StaySafe site settings).
-   --red-strong is the brand red darkened for 5:1 contrast with white text.
-   ===================================================================== */
-:root {
-  --navy: #1c325d;
-  --navy-dark: #14264a;
-  --blue: #00abec;
-  --blue-10: #e6f7fd;
-  --blue-20: #cceefb;
-  --red: #de5a6c;
-  --red-strong: #d02a40;
-  --red-strong-hover: #b62438;
-  --ink: #212934;
-  --ink-soft: #454545;
-  --line: #dbe3ec;
-  --white: #ffffff;
-  --radius: 16px;
-  --radius-sm: 10px;
-  --max: 1180px;
-  --font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
-  --font-ar: system-ui, "Segoe UI", Tahoma, "Noto Sans Arabic", "Geeza Pro", Arial, sans-serif;
-}
-
-*, *::before, *::after { box-sizing: border-box; }
-html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
-body { margin: 0; font-family: var(--font); font-size: 1rem; line-height: 1.6; color: var(--ink); background: var(--white); }
-html[lang="ar"] body { font-family: var(--font-ar); line-height: 1.8; }
-img, video { display: block; max-width: 100%; }
-h1, h2, h3 { color: var(--navy); line-height: 1.2; margin: 0 0 1rem; overflow-wrap: break-word; }
-.hero-grid > *, .split > *, .topics > *, .cards > *, .footer-grid > * { min-width: 0; }
-p { margin: 0 0 1rem; }
-a { color: var(--navy); text-underline-offset: 0.2em; }
-button, select { font: inherit; }
-
-/* Focus: navy ring on light backgrounds, white ring on dark ones */
-:focus-visible { outline: 3px solid var(--navy); outline-offset: 3px; border-radius: 4px; }
-main:focus { outline: none; }
-.on-dark :focus-visible { outline-color: var(--white); }
-
-.container { width: min(100% - 2.5rem, var(--max)); margin-inline: auto; }
-/* Elements marked hidden must stay hidden even when a rule below sets their display */
-[hidden] { display: none !important; }
-.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
-
-.skip-link { position: absolute; inset-inline-start: 1rem; top: -100px; z-index: 100; padding: 0.75rem 1rem; background: var(--navy); color: var(--white); font-weight: 700; border-radius: var(--radius-sm); }
-.skip-link:focus { top: 1rem; outline-color: var(--blue); }
-
-/* ---------- Buttons ---------- */
-.btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; min-height: 48px; padding: 0.7rem 1.5rem; border: 2px solid transparent; border-radius: 999px; font-weight: 700; line-height: 1.25; text-align: center; text-decoration: none; cursor: pointer; transition: background-color 0.15s, color 0.15s; }
-.btn-report { background: var(--red-strong); color: var(--white); }
-.btn-report:hover { background: var(--red-strong-hover); }
-.btn-outline { background: var(--white); border-color: var(--navy); color: var(--navy); }
-.btn-outline:hover { background: var(--navy); color: var(--white); }
-.arrow { display: inline-block; }
-[dir="rtl"] .arrow { transform: scaleX(-1); }
-
-/* ---------- Header and navigation (mobile first) ---------- */
-.site-header { position: sticky; top: 0; z-index: 50; background: var(--white); border-bottom: 1px solid var(--line); }
-.header-inner { display: grid; grid-template-columns: 1fr auto; grid-template-areas: "brand toggle" "panel panel"; align-items: center; column-gap: 1rem; }
-.brand { grid-area: brand; display: inline-flex; align-items: center; padding-block: 0.875rem; text-decoration: none; justify-self: start; }
-.brand img { width: auto; height: 32px; }
-/* "StaySafe" as an SOS sub-brand: separated by a dark blue bar. Clear space before the bar must be at least the
-   emblem's width; the emblem is 1.23 × the logo height (44px at the 36px logo height), so 2.875rem = 46px. */
-.brand-sub { display: none; margin-inline-start: 2.875rem; padding-inline-start: 1rem; border-inline-start: 2px solid var(--navy); color: var(--navy); font-weight: 800; font-size: 1.125rem; letter-spacing: 0.01em; line-height: 1.6; }
-
-.nav-toggle { grid-area: toggle; display: inline-flex; align-items: center; justify-content: center; width: 48px; height: 48px; padding: 0; border: 2px solid var(--navy); border-radius: var(--radius-sm); background: var(--white); color: var(--navy); cursor: pointer; }
-.nav-toggle-bars, .nav-toggle-bars::before, .nav-toggle-bars::after { display: block; width: 22px; height: 2px; background: currentColor; border-radius: 2px; transition: transform 0.2s; }
-.nav-toggle-bars { position: relative; }
-.nav-toggle-bars::before, .nav-toggle-bars::after { content: ""; position: absolute; inset-inline-start: 0; }
-.nav-toggle-bars::before { top: -7px; }
-.nav-toggle-bars::after { top: 7px; }
-.nav-toggle[aria-expanded="true"] .nav-toggle-bars { background: transparent; }
-.nav-toggle[aria-expanded="true"] .nav-toggle-bars::before { transform: translateY(7px) rotate(45deg); }
-.nav-toggle[aria-expanded="true"] .nav-toggle-bars::after { transform: translateY(-7px) rotate(-45deg); }
-html:not(.js) .nav-toggle { display: none; }
-
-.nav-panel { grid-area: panel; padding-block: 0.5rem 1.25rem; }
-.js .nav-panel { display: none; }
-.js .nav-panel.is-open { display: block; max-height: calc(100vh - 76px); overflow-y: auto; }
-
-.main-nav ul { list-style: none; margin: 0; padding: 0; }
-.main-nav a { display: flex; align-items: center; min-height: 48px; padding: 0.5rem 0.75rem; border-radius: var(--radius-sm); color: var(--navy); font-weight: 600; text-decoration: none; }
-.main-nav a:hover { background: var(--blue-10); }
-.main-nav a[aria-current="page"] { font-weight: 800; box-shadow: inset 4px 0 0 var(--blue); background: var(--blue-10); }
-[dir="rtl"] .main-nav a[aria-current="page"] { box-shadow: inset -4px 0 0 var(--blue); }
-.main-nav .nav-report { margin-top: 0.75rem; }
-.main-nav .nav-report a { justify-content: center; background: var(--red-strong); color: var(--white); border-radius: 999px; font-weight: 700; }
-.main-nav .nav-report a:hover { background: var(--red-strong-hover); }
-
-.lang-picker { display: flex; align-items: center; gap: 0.5rem; margin-top: 1rem; padding-inline: 0.75rem; color: var(--navy); }
-.lang-picker svg { flex: none; }
-.lang-picker select { min-height: 44px; padding: 0.4rem 2rem 0.4rem 0.75rem; border: 2px solid var(--navy); border-radius: var(--radius-sm); background: var(--white); color: var(--navy); font-weight: 600; cursor: pointer; }
-[dir="rtl"] .lang-picker select { padding: 0.4rem 0.75rem 0.4rem 2rem; }
-
-@media (min-width: 640px) {
-  .brand img { height: 36px; }
-  .brand-sub { display: inline-block; }
-}
-
-/* Desktop: logo and language on the first row, navigation on the second */
-@media (min-width: 1100px) {
-  .header-inner { grid-template-columns: auto 1fr; grid-template-areas: "brand tools" "nav nav"; }
-  .nav-toggle { display: none; }
-  .js .nav-panel, .nav-panel { display: contents; }
-  .lang-picker { grid-area: tools; justify-self: end; margin: 0; padding: 0; }
-  .main-nav { grid-area: nav; border-top: 1px solid var(--line); }
-  .main-nav ul { display: flex; flex-wrap: wrap; align-items: center; gap: 0.25rem; padding-block: 0.5rem; }
-  .main-nav a { min-height: 44px; padding: 0.5rem 0.85rem; font-size: 0.9375rem; }
-  .main-nav a[aria-current="page"], [dir="rtl"] .main-nav a[aria-current="page"] { background: none; box-shadow: inset 0 -3px 0 var(--blue); border-radius: 0; }
-  .main-nav .nav-report { margin-top: 0; margin-inline-start: auto; }
-  .main-nav .nav-report a { padding-inline: 1.25rem; }
-}
-
-/* ---------- Hero ---------- */
-.hero { background: var(--blue-10); padding-block: 2.5rem 3rem; }
-.hero-grid { display: grid; gap: 2rem; align-items: center; }
-.eyebrow { display: inline-flex; align-items: center; gap: 0.6rem; margin: 0 0 0.75rem; color: var(--navy); font-size: 0.875rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; }
-.eyebrow::before { content: ""; width: 28px; height: 4px; border-radius: 2px; background: var(--blue); }
-.hero h1 { font-size: clamp(1.875rem, 1.25rem + 2.6vw, 3rem); font-weight: 800; }
-.lead { font-size: 1.125rem; max-width: 38rem; }
-.actions { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 1.75rem; }
-
-.hero-media { position: relative; overflow: hidden; aspect-ratio: 16 / 9; border-radius: var(--radius); background: var(--blue-20); }
-.hero-media video { width: 100%; height: 100%; object-fit: cover; }
-.motion-toggle { position: absolute; inset-block-end: 0.75rem; inset-inline-end: 0.75rem; display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; padding: 0; border: 2px solid var(--white); border-radius: 50%; background: rgba(28, 50, 93, 0.88); color: var(--white); cursor: pointer; }
-.motion-toggle:focus-visible { outline-color: var(--navy); }
-/* Media icons keep their usual orientation in Arabic, as media players do */
-.motion-toggle .icon-pause { display: flex; gap: 4px; }
-.motion-toggle .icon-pause::before, .motion-toggle .icon-pause::after { content: ""; width: 4px; height: 14px; background: currentColor; border-radius: 1px; }
-.motion-toggle .icon-play { display: none; width: 0; height: 0; margin-left: 3px; border-top: 8px solid transparent; border-bottom: 8px solid transparent; border-left: 13px solid currentColor; }
-.motion-toggle[aria-pressed="true"] .icon-pause { display: none; }
-.motion-toggle[aria-pressed="true"] .icon-play { display: block; }
-
-@media (min-width: 900px) {
-  .hero { padding-block: 4rem 4.5rem; }
-  .hero-grid { grid-template-columns: 1fr 1.1fr; gap: 3.5rem; }
-}
-
-/* ---------- Content sections ---------- */
-.section { padding-block: 3.5rem; }
-.section-tint { background: var(--blue-10); }
-.section h2 { font-size: clamp(1.5rem, 1.15rem + 1.5vw, 2.125rem); font-weight: 800; }
-.split { display: grid; gap: 2rem; align-items: center; }
-.illustration { margin: 0; }
-.illustration img, .illustration canvas { display: block; width: 100%; max-width: 340px; height: auto; margin-inline: auto; border-radius: var(--radius); background: var(--white); }
-.panel { padding: 1.75rem; border-radius: var(--radius); background: var(--white); border-inline-start: 6px solid var(--blue); }
-@media (min-width: 800px) {
-  .section { padding-block: 5rem; }
-  .split { grid-template-columns: 1.5fr 1fr; gap: 3.5rem; }
-  .split-reverse > :first-child { order: 2; }
-  .panel { padding: 2.5rem; }
-}
-
-/* Topic rows: Your Rights, Preventing Abuse, Reporting Abuse */
-.topics { display: grid; gap: 1.5rem; }
-.topic { display: grid; overflow: hidden; border: 1px solid var(--line); border-radius: var(--radius); background: var(--white); }
-.topic img { width: 100%; height: 100%; aspect-ratio: 16 / 9; object-fit: cover; }
-.topic-body { display: flex; flex-direction: column; justify-content: center; padding: 1.75rem; }
-.topic-body h2 { margin-bottom: 0.75rem; }
-.topic-body p:last-of-type { margin-bottom: 1.25rem; }
-.text-link { display: inline-flex; align-items: center; gap: 0.5rem; min-height: 44px; align-self: flex-start; color: var(--navy); font-weight: 700; text-decoration: underline; text-decoration-thickness: 2px; text-decoration-color: var(--blue); }
-.text-link:hover { text-decoration-color: var(--navy); }
-@media (min-width: 800px) {
-  .topic { grid-template-columns: 1fr 1fr; min-height: 320px; }
-  .topic img { aspect-ratio: auto; }
-  .topic:nth-child(even) img { order: 2; }
-  .topic-body { padding: 2.5rem 3rem; }
-}
-
-/* Cyber Safeguarding and Fairness & Integrity cards */
-.cards { display: grid; gap: 1.5rem; }
-.card { display: flex; flex-direction: column; padding: 1.75rem; border-radius: var(--radius); background: var(--white); border-top: 6px solid var(--blue); }
-.card p { flex: 1; }
-@media (min-width: 800px) {
-  .cards { grid-template-columns: 1fr 1fr; }
-  .card { padding: 2.25rem 2.5rem; }
-}
-
-/* ---------- Report a safety concern ---------- */
-.report-cta { position: relative; color: var(--white); background: var(--navy) url("Images/report-concern-banner.jpg") center / cover no-repeat; }
-.report-cta::before { content: ""; position: absolute; inset: 0; background: rgba(28, 50, 93, 0.9); }
-.report-cta .container { position: relative; text-align: center; padding-block: 3.5rem; }
-.report-cta h2 { color: var(--white); font-size: clamp(1.625rem, 1.2rem + 1.8vw, 2.375rem); font-weight: 800; }
-.report-cta p { font-size: 1.125rem; max-width: 40rem; margin-inline: auto; }
-.report-cta .btn { margin-top: 0.75rem; font-size: 1.0625rem; padding-inline: 2rem; }
-.channel-note { margin-top: 1rem; font-size: 0.9375rem; color: var(--blue-20); }
-@media (min-width: 800px) { .report-cta .container { padding-block: 4.5rem; } }
-
-/* ---------- Footer ---------- */
-.site-footer { background: var(--navy); color: var(--white); padding-block: 3rem 2rem; }
-.site-footer a { color: var(--white); }
-.footer-grid { display: grid; gap: 2rem; }
-.footer-brand { display: inline-flex; align-items: center; text-decoration: none; }
-.footer-brand img { width: auto; height: 36px; }
-.footer-heading { margin: 0 0 0.75rem; color: var(--blue-20); font-size: 0.875rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
-.footer-links { list-style: none; margin: 0; padding: 0; }
-.footer-links a, .footer-links button { display: inline-flex; align-items: center; min-height: 44px; padding: 0; text-decoration: none; }
-.footer-links a:hover, .footer-links button:hover { text-decoration: underline; }
-.footer-langs { display: flex; flex-wrap: wrap; gap: 0.5rem; list-style: none; margin: 0; padding: 0; }
-.footer-langs button { min-height: 44px; padding: 0.35rem 0.9rem; border: 1px solid rgba(255, 255, 255, 0.5); border-radius: 999px; background: transparent; color: var(--white); cursor: pointer; }
-.footer-langs button[aria-pressed="true"] { background: var(--white); color: var(--navy); font-weight: 700; border-color: var(--white); }
-.footer-bottom { display: flex; flex-wrap: wrap; gap: 0.5rem 1.5rem; align-items: center; justify-content: space-between; margin-top: 2.5rem; padding-top: 1.5rem; border-top: 1px solid rgba(255, 255, 255, 0.25); font-size: 0.9375rem; }
-.footer-bottom p { margin: 0; }
-@media (min-width: 800px) {
-  .footer-grid { grid-template-columns: 1.2fr 1fr 1fr; gap: 3rem; }
-}
-
-/* ---------- Content pages (same rules as your-rights.html and preventing-abuse.html) ---------- */
-.section-dark { background: var(--navy); color: var(--white); }
-.section-dark h2, .section-dark h3 { color: var(--white); }
+/* Page-specific styles (shared styles are in site.css) */
 .highlight { padding-inline-start: 1.25rem; border-inline-start: 4px solid var(--blue); font-size: 1.0625rem; }
-.embed-frame { position: relative; aspect-ratio: 16 / 9; margin-top: 1.5rem; overflow: hidden; border: 1px solid var(--line); border-radius: var(--radius); background: var(--blue-10); }
-.embed-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
-/* Visible focus while focus is inside an embedded module. Set by script: browsers do not pass
-   :focus-within across the boundary into another site's frame. */
-.embed-frame.has-focus { outline: 3px solid var(--navy); outline-offset: 3px; }
 
 /* ---------- Reporting Abuse page ---------- */
 /* Four-step journey overview */
@@ -275,9 +60,6 @@ html:not(.js) .nav-toggle { display: none; }
 .station-num { margin: 0 0 0.75rem; width: 48px; height: 48px; font-size: 1.375rem; background: var(--blue); color: var(--navy); }
 .section-dark .station-num { background: var(--blue); color: var(--navy); }
 .station { scroll-margin-top: 140px; }
-/* Shown on a section whose text is not yet translated into the selected language */
-.lang-pill { display: inline-block; margin: 0 0 0.75rem 0.75rem; padding: 0.15rem 0.75rem; border: 1px solid currentColor; border-radius: 999px; font-size: 0.8125rem; font-weight: 700; vertical-align: top; }
-[dir="rtl"] .lang-pill { margin: 0 0.75rem 0.75rem 0; }
 /* Station 1: reporting channels */
 .channel-grid { list-style: none; margin: 1.5rem 0 0; padding: 0; display: grid; gap: 1rem; }
 .channel { display: flex; flex-direction: column; padding: 1.5rem; border-radius: var(--radius); background: var(--white); border-top: 6px solid var(--blue); }
@@ -306,7 +88,6 @@ html:not(.js) .nav-toggle { display: none; }
 /* Station 4: Ombuds Office */
 .ombuds { max-width: 52rem; }
 .btn-light { background: var(--white); color: var(--navy); border-color: var(--white); margin-top: 0.5rem; }
-.btn-light:hover { background: var(--blue-20); }
 .ombuds .channel-note { margin-top: 0.75rem; }
 @media (min-width: 700px) {
   .channel-grid { grid-template-columns: 1fr 1fr; }
@@ -318,19 +99,6 @@ html:not(.js) .nav-toggle { display: none; }
   .channel-wide { grid-column: span 2; }
   .after-grid { grid-template-columns: 1.2fr 1fr; }
 }
-
-/* ---------- Motion and data saving ---------- */
-@media (prefers-reduced-motion: reduce) {
-  html { scroll-behavior: auto; }
-  *, *::before, *::after { transition: none !important; animation: none !important; }
-  .illustration { display: none; }
-  .split { grid-template-columns: 1fr; }
-  .split > div { max-width: 48rem; }
-}
-/* Data saver on: skip the animated illustrations entirely */
-.save-data .illustration { display: none; }
-.save-data .split { grid-template-columns: 1fr; }
-.save-data .split > div { max-width: 48rem; }
 </style>
 </head>
 
@@ -424,7 +192,6 @@ html:not(.js) .nav-toggle { display: none; }
   <!-- ===================== 1. WHERE CAN YOU REPORT? ===================== -->
   <section class="section section-tint station" id="where" aria-labelledby="where-heading">
     <div class="container">
-      <p class="lang-pill" lang="en" hidden>English</p>
       <p class="station-num" aria-hidden="true">1</p>
       <h2 id="where-heading" data-i18n="where.title">Where can you report?</h2>
       <ul class="channel-grid">
@@ -464,7 +231,6 @@ html:not(.js) .nav-toggle { display: none; }
   <!-- ===================== 2. WHAT INFORMATION SHOULD YOU SHARE? ===================== -->
   <section class="section station" id="share" aria-labelledby="share-heading">
     <div class="container">
-      <p class="lang-pill" lang="en" hidden>English</p>
       <p class="station-num" aria-hidden="true">2</p>
       <h2 id="share-heading" data-i18n="share.title">What information should you share?</h2>
       <div class="question-grid">
@@ -492,7 +258,6 @@ html:not(.js) .nav-toggle { display: none; }
   <!-- ===================== 3. WHAT HAPPENS AFTER YOU REPORT? ===================== -->
   <section class="section section-tint station" id="after" aria-labelledby="after-heading">
     <div class="container">
-      <p class="lang-pill" lang="en" hidden>English</p>
       <p class="station-num" aria-hidden="true">3</p>
       <h2 id="after-heading" data-i18n="after.title">What happens after you report?</h2>
       <div class="after-grid">
@@ -520,7 +285,6 @@ html:not(.js) .nav-toggle { display: none; }
   <!-- ===================== 4. WHAT IF YOUR REPORT IS NOT TAKEN SERIOUSLY? ===================== -->
   <section class="section section-dark on-dark station" id="ombuds" aria-labelledby="ombuds-heading">
     <div class="container ombuds">
-      <p class="lang-pill" lang="en" hidden>English</p>
       <p class="station-num" aria-hidden="true">4</p>
       <h2 id="ombuds-heading" data-i18n="ombuds.title">What if your report is not taken seriously?</h2>
       <p data-i18n="ombuds.text1">If you don’t get a response to your report, feel it is not being taken seriously, or are unhappy with how it was handled or with the outcome, you can contact the Ombuds Office.</p>
@@ -553,7 +317,7 @@ html:not(.js) .nav-toggle { display: none; }
   </section>
 </main>
 
-<!-- ===================== 9. FOOTER ===================== -->
+<!-- ===================== FOOTER ===================== -->
 <footer class="site-footer on-dark">
   <div class="container">
     <div class="footer-grid">
@@ -561,6 +325,13 @@ html:not(.js) .nav-toggle { display: none; }
         <a class="footer-brand" href="index.html">
           <img src="Images/sos-logo-white.png" width="366" height="60" alt="SOS Children’s Villages – SOS StaySafe home" loading="lazy" decoding="async">
         </a>
+        <p class="footer-org"><a href="https://www.sos-childrensvillages.org/" target="_blank" rel="noopener"><span data-i18n="ui.intl">SOS Children’s Villages International</span><span class="sr-only" data-i18n="ui.newTab">(opens in a new tab)</span><span aria-hidden="true">↗</span></a></p>
+        <details class="footer-install">
+          <summary data-i18n="ui.install.title">Use SOS StaySafe on your phone</summary>
+          <p data-i18n="ui.install.android">Android: open the browser menu (⋮) and choose “Install app” or “Add to Home screen”.</p>
+          <p data-i18n="ui.install.ios">iPhone or iPad: in Safari, tap Share, then “Add to Home Screen”.</p>
+          <p data-i18n="ui.install.offline">Pages you have opened then work without internet. Reporting a concern on SOS SpeakUp always needs internet.</p>
+        </details>
       </div>
 
       <nav data-i18n-attr="aria-label:ui.footerNav" aria-label="Footer">
@@ -596,336 +367,251 @@ html:not(.js) .nav-toggle { display: none; }
 </footer>
 
 <script>
-/* =====================================================================
-   SOS StaySafe — page behaviour (same mechanism as index.html)
-   Reporting Abuse page.
-   1. Translations   2. Language selection   3. Hero video, animations and embedded module
-   4. Mobile navigation
-   English is read from the page itself, so it is written only once (in the HTML above).
-   Text taken from the WordPress XML export of 24 November 2026.
-   A key missing from a language falls back to English and is marked lang="en".
-   ===================================================================== */
-
-/* ---------- 1. Translations (es, fr, ar, pt, ru) ---------- */
-const TRANSLATIONS = {
-  /* REVIEW (25 Nov 2026): the four reporting stations (where to report, what to share, what happens next,
-     the Ombuds Office) exist only in English in the original site (saved element "toggle" and the English
-     Genially module used on every language page), so other languages show them in English, labelled "English".
-     cta.title and cta.text keep the existing translation ("You have the right to be safe. If you have suffered
-     abuse or neglect, report it.") until the revised English closing message is translated. */
-  es: {
-    "nav.home": "Inicio",
-    "nav.rights": "Sus derechos",
-    "nav.preventing": "Prevención de abusos",
-    "nav.reporting": "Denuncia de malos tratos",
-    "nav.cyber": "Ciberseguridad",
-    "nav.report": "Reportar Preocupación",
-    "nav.privacy": "Política de privacidad",
-    "cta.button": "NOTIFICAR UN PROBLEMA DE SEGURIDAD",
-    "footer.copyright": "Copyright",
-    "footer.rights": "Todos los derechos reservados",
-    "intro.text": "Desgraciadamente, incluso con todos los esfuerzos de prevención, pueden producirse abusos. Aldeas Infantiles SOS tiene el deber de poner a tu disposición diferentes canales de denuncia para que puedas informar a la gente si has sufrido o presenciado abusos o simplemente lo sospechas. Aunque no estés seguro o no tengas pruebas, es importante que lo denuncies. Aldeas Infantiles SOS estudiará todas las denuncias que reciba y responderá con las medidas adecuadas.",
-    "process.title": "Proceso de información",
-    "involve.title": "Algunas formas en que los niños y los jóvenes pueden participar en la denuncia y la respuesta son:",
-    "cta.title": "Tienes derecho a estar seguro.",
-    "cta.text": "Si ha sufrido malos tratos o abandono, denúncielo."
-  },
-  fr: {
-    "nav.home": "Accueil",
-    "nav.rights": "Vos droits",
-    "nav.preventing": "Prévenir les abus",
-    "nav.reporting": "Signaler un abus",
-    "nav.cyber": "Sauvegarde cybernétique",
-    "nav.report": "Signaler une préoccupation",
-    "nav.privacy": "Politique de confidentialité",
-    "cta.button": "SIGNALER UN PROBLÈME DE SÉCURITÉ",
-    "footer.copyright": "Copyright",
-    "footer.rights": "Tous droits réservés",
-    "intro.text": "Malheureusement, malgré tous les efforts de prévention, des abus peuvent encore se produire. Il est du devoir de SOS Villages d'Enfants de vous fournir différents canaux de signalement afin que vous puissiez informer les gens si vous avez vécu ou été témoin d'un abus ou si vous le soupçonnez. Même si vous n'êtes pas sûr ou si vous n'avez pas de preuves, il est important que vous le signaliez. SOS Villages d'Enfants examinera tous les rapports qu'elle reçoit et y répondra en prenant les mesures appropriées.",
-    "process.title": "Processus d'élaboration des rapports",
-    "involve.title": "Les enfants et les jeunes peuvent s'impliquer dans le signalement et l'intervention de certaines façons :",
-    "cta.title": "Vous avez le droit d'être en sécurité.",
-    "cta.text": "Si vous avez été victime d'un abus ou d'une négligence, signalez-le."
-  },
-  ar: {
-    "nav.home": "بيت",
-    "nav.rights": "حقوقك",
-    "nav.preventing": "منع إساءة المعاملة",
-    "nav.reporting": "الإبلاغ عن إساءة المعاملة",
-    "nav.cyber": "الحماية السيبرانية",
-    "nav.report": "الإبلاغ عن القلق",
-    "nav.privacy": "سياسة الخصوصية",
-    "cta.button": "الإبلاغ عن مخاوف تتعلق بالسلامة",
-    "footer.copyright": "حقوق النشر",
-    "footer.rights": "جميع الحقوق محفوظة",
-    "intro.text": "لسوء الحظ، حتى مع كل جهود الوقاية، لا يزال من الممكن أن تحدث إساءة المعاملة. من واجب قرى الأطفال SOS أن توفر لك قنوات مختلفة للإبلاغ حتى تتمكن من إخبار الناس إذا كنت قد تعرضت أو شاهدت إساءة معاملة أو مجرد الاشتباه في ذلك. حتى لو لم تكن متأكدًا أو لم يكن لديك دليل، فمن المهم أن تبلغ عن ذلك. ستنظر قرى الأطفال SOS في جميع البلاغات التي تتلقاها وتستجيب لها بالإجراء المناسب.",
-    "process.title": "عملية إعداد التقارير",
-    "involve.title": "فيما يلي بعض الطرق التي يمكن للأطفال والشباب من خلالها المشاركة في الإبلاغ والاستجابة:",
-    "cta.title": "من حقك أن تكوني بأمان.",
-    "cta.text": "إذا تعرضت للإساءة أو الإهمال، فأبلغ عن ذلك."
-  },
-  pt: {
-    "nav.home": "Início",
-    "nav.rights": "Os seus direitos",
-    "nav.preventing": "Prevenção de abusos",
-    "nav.reporting": "Denúncia de abusos",
-    "nav.cyber": "Proteção cibernética",
-    "nav.report": "Relatar Preocupação",
-    "nav.privacy": "Política de privacidade",
-    "cta.button": "COMUNICAR UM PROBLEMA DE SEGURANÇA",
-    "footer.copyright": "Copyright",
-    "footer.rights": "Todos os direitos reservados",
-    "intro.text": "Infelizmente, mesmo com todos os esforços de prevenção, os abusos podem continuar a acontecer. É dever das Aldeias de Crianças SOS proporcionar-lhe diferentes canais de denúncia para que possa contar às pessoas se tiver sofrido ou testemunhado um abuso ou apenas suspeitar dele. Mesmo que não tenha a certeza ou não disponha de provas, é importante que comunique o facto. As Aldeias de Crianças SOS analisarão todas as denúncias que receberem e responderão com as medidas adequadas.",
-    "process.title": "Processo de apresentação de relatórios",
-    "involve.title": "Algumas formas de as crianças e os jovens se envolverem na denúncia e na resposta são",
-    "cta.title": "Tem o direito de estar em segurança.",
-    "cta.text": "Se tiver sido vítima de abuso ou negligência, comunique-o."
-  },
-  ru: {
-    "nav.home": "Главная",
-    "nav.rights": "Ваши права",
-    "nav.preventing": "Предотвращение злоупотреблений",
-    "nav.reporting": "Сообщение о злоупотреблениях",
-    "nav.cyber": "Кибербезопасность",
-    "nav.report": "Сообщить о проблеме",
-    "nav.privacy": "Политика конфиденциальности",
-    "cta.button": "СООБЩИТЬ О ПРОБЛЕМЕ БЕЗОПАСНОСТИ",
-    "footer.copyright": "Copyright",
-    "footer.rights": "Все права защищены",
-    "intro.text": "К сожалению, даже несмотря на все усилия по профилактике, жестокое обращение все равно может произойти. SOS Детские деревни обязаны предоставить вам различные каналы связи, чтобы вы могли рассказать людям, если вы стали свидетелем или свидетелем жестокого обращения или просто подозреваете его. Даже если вы не уверены или у вас нет доказательств, важно сообщить об этом. SOS Детские деревни рассмотрит все полученные сообщения и примет соответствующие меры.",
-    "process.title": "Процесс отчетности",
-    "involve.title": "Некоторые способы, с помощью которых дети и подростки могут принять участие в составлении отчетов и реагировании, таковы:",
-    "cta.title": "Вы имеете право на безопасность.",
-    "cta.text": "Если вы подверглись насилию или пренебрежению, сообщите об этом."
+/* Page settings and this page's translations (es, fr, ar, pt, ru). Navigation, footer and interface text
+   are shared and live in site.js. REVIEW: the four reporting stations existed only in English on the original site; they are translated here with official terminology (25 Nov 2026), as is the closing message. The rest are the approved WordPress translations. */
+window.STAYSAFE_PAGE = {
+  titleKey: "nav.reporting",
+  descKey: "intro.text",
+  video: "reporting-abuse-banner",
+  translations: {
+    "es": {
+      "cta.button": "NOTIFICAR UN PROBLEMA DE SEGURIDAD",
+      "intro.text": "Desgraciadamente, incluso con todos los esfuerzos de prevención, pueden producirse abusos. Aldeas Infantiles SOS tiene el deber de poner a tu disposición diferentes canales de denuncia para que puedas informar a la gente si has sufrido o presenciado abusos o simplemente lo sospechas. Aunque no estés seguro o no tengas pruebas, es importante que lo denuncies. Aldeas Infantiles SOS estudiará todas las denuncias que reciba y responderá con las medidas adecuadas.",
+      "process.title": "Proceso de información",
+      "involve.title": "Algunas formas en que los niños y los jóvenes pueden participar en la denuncia y la respuesta son:",
+      "cta.title": "Mereces que te escuchen.",
+      "cta.text": "Si te ha pasado algo a ti o a otra persona, hablar es un primer paso importante. Tú no tienes la culpa del abuso. Mereces estar a salvo, que te escuchen y que te apoyen.",
+      "where.title": "¿Dónde puedes denunciar?",
+      "share.title": "¿Qué información debes compartir?",
+      "after.title": "¿Qué pasa después de denunciar?",
+      "ombuds.title": "¿Y si no se toma en serio tu denuncia?",
+      "where.adult.title": "Una persona adulta de confianza",
+      "where.adult.text": "Habla con una persona adulta de confianza, como tu madre o tu padre, tu cuidador o cuidadora o un profesor o profesora. Puede ayudarte a presentar una denuncia.",
+      "where.team.title": "Tu persona o equipo de protección infantil",
+      "where.team.text": "Cada centro y oficina de Aldeas Infantiles SOS cuenta con una persona o un equipo de protección infantil. Puedes comunicarles directamente cualquier preocupación.",
+      "where.hotline.title": "Una línea de ayuda de protección infantil",
+      "where.hotline.text": "Debería haber una línea de ayuda a la que puedas llamar para comunicar una preocupación. El número debería estar bien visible en carteles en tu centro SOS.",
+      "where.email.title": "Correo electrónico",
+      "where.email.text": "Puedes escribir un correo electrónico a tu equipo local de protección infantil. La dirección debería estar bien visible en carteles en tu centro SOS.",
+      "where.speakup.title": "El canal de denuncias: SOS SpeakUp",
+      "where.speakup.text": "El canal de denuncias de Aldeas Infantiles SOS es un sistema de denuncia confidencial. Te permite comunicar una preocupación sin decir quién eres.",
+      "where.anon.title": "En SpeakUp, tú decides si das tu nombre",
+      "where.anon.text": "Si usas el canal de denuncias, puedes elegir si das tu nombre o no. Cuando hablas directamente con alguien, como una persona adulta de confianza o tu equipo de protección infantil, sabrá quién eres. Todas las denuncias se toman en serio, des tu nombre o no.",
+      "share.what.q": "¿Qué pasó?",
+      "share.what.a": "Cuenta lo que viste, viviste u oíste.",
+      "share.who.q": "¿Quién estuvo implicado?",
+      "share.who.a": "Indica los nombres de las personas que sabes que estuvieron implicadas o presentes, si los conoces.",
+      "share.how.q": "¿Cómo ocurrió?",
+      "share.how.a": "Describe lo que pasó en el orden en que lo recuerdas.",
+      "share.when.q": "¿Cuándo ocurrió?",
+      "share.when.a": "Indica la fecha, la hora aproximada o cualquier otro dato que ayude a saber cuándo ocurrió.",
+      "share.reassure": "No pasa nada si no puedes responder a todas las preguntas. Cuenta lo que sepas y recuerdes. No tienes que investigar ni reunir pruebas tú mismo o tú misma: un equipo con formación especializada se encargará de ello.",
+      "after.s1": "Se recibe tu denuncia.",
+      "after.s2": "Un equipo con formación especializada examina tu denuncia y valora la información que compartiste.",
+      "after.s3": "Si necesitan entender algo mejor y diste tus datos de contacto, es posible que se pongan en contacto contigo para hacerte más preguntas.",
+      "after.s4": "También deberían ofrecerte apoyo, como la posibilidad de hablar con un orientador o un psicólogo.",
+      "after.s5": "Una vez comprobados todos los detalles, deciden cuáles deben ser los siguientes pasos.",
+      "after.next.title": "Algunos posibles pasos siguientes:",
+      "after.next.1": "una investigación interna",
+      "after.next.2": "formación adicional para las personas que cuidan de niños y niñas",
+      "after.next.3": "talleres para niños, niñas y jóvenes",
+      "after.next.4": "informar a la policía",
+      "after.next.note": "Lo que ocurra después depende de cada situación. Todas las denuncias se toman en serio y las gestionan personas formadas para ello.",
+      "ombuds.text1": "Si no recibes respuesta a tu denuncia, sientes que no se está tomando en serio o no estás de acuerdo con cómo se gestionó o con el resultado, puedes ponerte en contacto con la Oficina del Ombuds.",
+      "ombuds.text2": "La Oficina del Ombuds es independiente de Aldeas Infantiles SOS. El Ombuds es una persona amable y de confianza que sabe escuchar y puede ayudar cuando las cosas no parecen funcionar como deberían: está ahí para apoyar y orientar a niños, niñas y jóvenes como tú.",
+      "ombuds.link": "Contacta con la Oficina del Ombuds de Aldeas Infantiles SOS"
+    },
+    "fr": {
+      "cta.button": "SIGNALER UN PROBLÈME DE SÉCURITÉ",
+      "intro.text": "Malheureusement, malgré tous les efforts de prévention, des abus peuvent encore se produire. Il est du devoir de SOS Villages d'Enfants de vous fournir différents canaux de signalement afin que vous puissiez informer les gens si vous avez vécu ou été témoin d'un abus ou si vous le soupçonnez. Même si vous n'êtes pas sûr ou si vous n'avez pas de preuves, il est important que vous le signaliez. SOS Villages d'Enfants examinera tous les rapports qu'elle reçoit et y répondra en prenant les mesures appropriées.",
+      "process.title": "Processus d'élaboration des rapports",
+      "involve.title": "Les enfants et les jeunes peuvent s'impliquer dans le signalement et l'intervention de certaines façons :",
+      "cta.title": "Vous méritez qu’on vous écoute.",
+      "cta.text": "S’il vous est arrivé quelque chose, à vous ou à quelqu’un d’autre, en parler est une première étape importante. Vous n’êtes pas responsable de l’abus. Vous méritez la sécurité, l’écoute et le soutien.",
+      "where.title": "Où pouvez-vous faire un signalement ?",
+      "share.title": "Quelles informations devez-vous partager ?",
+      "after.title": "Que se passe-t-il après votre signalement ?",
+      "ombuds.title": "Et si votre signalement n’est pas pris au sérieux ?",
+      "where.adult.title": "Un adulte de confiance",
+      "where.adult.text": "Parlez à un adulte en qui vous avez confiance, comme un parent, une personne qui s’occupe de vous ou un enseignant. Il peut vous aider à faire un signalement.",
+      "where.team.title": "Votre personne ou équipe chargée de la protection de l’enfance",
+      "where.team.text": "Chaque site et chaque bureau de SOS Villages d’Enfants dispose d’une personne ou d’une équipe chargée de la protection de l’enfance. Vous pouvez lui signaler directement toute préoccupation.",
+      "where.hotline.title": "Une ligne d’assistance pour la protection de l’enfance",
+      "where.hotline.text": "Il devrait exister une ligne d’assistance que vous pouvez appeler pour signaler une préoccupation. Le numéro devrait être clairement affiché sur des affiches dans votre site SOS.",
+      "where.email.title": "E-mail",
+      "where.email.text": "Vous pouvez écrire un e-mail à votre équipe locale de protection de l’enfance. L’adresse devrait être clairement affichée sur des affiches dans votre site SOS.",
+      "where.speakup.title": "Le canal de signalement : SOS SpeakUp",
+      "where.speakup.text": "Le canal de signalement de SOS Villages d’Enfants est un système de signalement confidentiel. Il vous permet de signaler une préoccupation sans dire qui vous êtes.",
+      "where.anon.title": "Sur SpeakUp, c’est vous qui choisissez de donner votre nom ou non",
+      "where.anon.text": "Si vous utilisez le canal de signalement, vous pouvez choisir de donner votre nom ou non. Lorsque vous parlez directement à quelqu’un, comme un adulte de confiance ou votre équipe de protection de l’enfance, cette personne saura qui vous êtes. Chaque signalement est pris au sérieux, que vous donniez votre nom ou non.",
+      "share.what.q": "Que s’est-il passé ?",
+      "share.what.a": "Racontez ce que vous avez vu, vécu ou entendu.",
+      "share.who.q": "Qui était impliqué ?",
+      "share.who.a": "Donnez les noms des personnes impliquées ou présentes, si vous les connaissez.",
+      "share.how.q": "Comment cela s’est-il passé ?",
+      "share.how.a": "Décrivez ce qui s’est passé dans l’ordre où vous vous en souvenez.",
+      "share.when.q": "Quand cela s’est-il passé ?",
+      "share.when.a": "Indiquez la date, l’heure approximative ou tout autre élément qui aide à savoir quand cela s’est passé.",
+      "share.reassure": "Ce n’est pas grave si vous ne pouvez pas répondre à toutes les questions. Partagez ce que vous savez et ce dont vous vous souvenez. Vous n’avez pas à enquêter ni à rassembler des preuves vous-même : une équipe spécialement formée s’en chargera.",
+      "after.s1": "Votre signalement est reçu.",
+      "after.s2": "Une équipe spécialement formée examine votre signalement et évalue les informations que vous avez partagées.",
+      "after.s3": "S’ils ont besoin de mieux comprendre quelque chose et que vous avez donné vos coordonnées, ils peuvent vous contacter pour vous poser d’autres questions.",
+      "after.s4": "Ils devraient aussi vous proposer un soutien, comme la possibilité de parler à un conseiller ou à un psychologue.",
+      "after.s5": "Une fois tous les éléments vérifiés, ils décident des prochaines étapes.",
+      "after.next.title": "Les prochaines étapes possibles sont notamment :",
+      "after.next.1": "une enquête interne",
+      "after.next.2": "une formation complémentaire pour les personnes qui s’occupent des enfants",
+      "after.next.3": "des ateliers pour les enfants et les jeunes",
+      "after.next.4": "l’information de la police",
+      "after.next.note": "La suite dépend de chaque situation. Chaque signalement est pris au sérieux et traité par des personnes formées à cet effet.",
+      "ombuds.text1": "Si vous ne recevez pas de réponse à votre signalement, si vous avez l’impression qu’il n’est pas pris au sérieux ou si vous n’êtes pas satisfait de la façon dont il a été traité ou de son résultat, vous pouvez contacter le Bureau de l’Ombuds.",
+      "ombuds.text2": "Le Bureau de l’Ombuds est indépendant de SOS Villages d’Enfants. L’Ombuds est une personne bienveillante et digne de confiance, qui sait écouter et peut aider lorsque les choses ne semblent pas fonctionner comme elles le devraient : elle est là pour soutenir et guider les enfants et les jeunes comme vous.",
+      "ombuds.link": "Contacter le Bureau de l’Ombuds de SOS Villages d’Enfants"
+    },
+    "ar": {
+      "cta.button": "الإبلاغ عن مخاوف تتعلق بالسلامة",
+      "intro.text": "لسوء الحظ، حتى مع كل جهود الوقاية، لا يزال من الممكن أن تحدث إساءة المعاملة. من واجب قرى الأطفال SOS أن توفر لك قنوات مختلفة للإبلاغ حتى تتمكن من إخبار الناس إذا كنت قد تعرضت أو شاهدت إساءة معاملة أو مجرد الاشتباه في ذلك. حتى لو لم تكن متأكدًا أو لم يكن لديك دليل، فمن المهم أن تبلغ عن ذلك. ستنظر قرى الأطفال SOS في جميع البلاغات التي تتلقاها وتستجيب لها بالإجراء المناسب.",
+      "process.title": "عملية إعداد التقارير",
+      "involve.title": "فيما يلي بعض الطرق التي يمكن للأطفال والشباب من خلالها المشاركة في الإبلاغ والاستجابة:",
+      "cta.title": "من حقك أن يُستمع إليك.",
+      "cta.text": "إذا حدث شيء لك أو لشخص آخر، فإن التحدث خطوة أولى مهمة. أنت لست مسؤولاً عن الإساءة. من حقك أن تكون آمناً وأن يُستمع إليك وأن تحصل على الدعم.",
+      "where.title": "أين يمكنك الإبلاغ؟",
+      "share.title": "ما المعلومات التي يجب أن تشاركها؟",
+      "after.title": "ماذا يحدث بعد الإبلاغ؟",
+      "ombuds.title": "ماذا لو لم يؤخذ بلاغك على محمل الجد؟",
+      "where.adult.title": "شخص بالغ تثق به",
+      "where.adult.text": "تحدّث إلى شخص بالغ تثق به، مثل أحد والديك أو مقدّم الرعاية أو المعلّم. يمكنه مساعدتك في تقديم بلاغ.",
+      "where.team.title": "مسؤول الحماية أو فريق الحماية",
+      "where.team.text": "لكل موقع ومكتب تابع لقرى الأطفال SOS مسؤول حماية أو فريق حماية. يمكنك إبلاغهم مباشرة بأي مخاوف.",
+      "where.hotline.title": "خط ساخن للحماية",
+      "where.hotline.text": "يجب أن يكون هناك خط ساخن يمكنك الاتصال به للإبلاغ عن مخاوفك. ويجب أن يكون الرقم معروضاً بوضوح على الملصقات في موقع SOS الخاص بك.",
+      "where.email.title": "البريد الإلكتروني",
+      "where.email.text": "يمكنك مراسلة فريق حماية الطفل المحلي عبر البريد الإلكتروني. ويجب أن يكون العنوان معروضاً بوضوح على الملصقات في موقع SOS الخاص بك.",
+      "where.speakup.title": "قناة الإبلاغ عن المخالفات: SOS SpeakUp",
+      "where.speakup.text": "قناة الإبلاغ عن المخالفات في قرى الأطفال SOS هي نظام إبلاغ سري. وهي تتيح لك الإبلاغ عن مخاوفك دون أن تذكر هويتك.",
+      "where.anon.title": "في SpeakUp، ذكر اسمك هو اختيارك",
+      "where.anon.text": "إذا استخدمت قناة الإبلاغ عن المخالفات، يمكنك أن تختار ذكر اسمك أو عدم ذكره. وعندما تتحدث مباشرة إلى شخص ما، مثل شخص بالغ تثق به أو فريق الحماية، فسيعرف من أنت. ويؤخذ كل بلاغ على محمل الجد، سواء ذكرت اسمك أم لا.",
+      "share.what.q": "ماذا حدث؟",
+      "share.what.a": "شارك ما رأيته أو مررت به أو سمعته.",
+      "share.who.q": "من كان متورطاً؟",
+      "share.who.a": "اذكر أسماء الأشخاص الذين تعرف أنهم كانوا متورطين أو حاضرين، إن كنت تعرفهم.",
+      "share.how.q": "كيف حدث ذلك؟",
+      "share.how.a": "صف ما حدث بالترتيب الذي تتذكره.",
+      "share.when.q": "متى حدث ذلك؟",
+      "share.when.a": "اذكر التاريخ أو الوقت التقريبي أو أي شيء آخر يساعد على توضيح متى حدث ذلك.",
+      "share.reassure": "لا بأس إن لم تستطع الإجابة عن كل الأسئلة. شارك ما تعرفه وما تتذكره. لا تحتاج إلى التحقيق أو جمع الأدلة بنفسك، فسيتولى ذلك فريق مدرَّب خصيصاً.",
+      "after.s1": "يتم استلام بلاغك.",
+      "after.s2": "يطّلع فريق مدرَّب خصيصاً على بلاغك ويقيّم المعلومات التي شاركتها.",
+      "after.s3": "إذا احتاجوا إلى فهم أمر ما بشكل أفضل وكنت قد قدّمت بيانات الاتصال الخاصة بك، فقد يتواصلون معك لطرح مزيد من الأسئلة.",
+      "after.s4": "وينبغي أن يقدّموا لك الدعم أيضاً، مثل فرصة التحدث إلى مرشد أو أخصائي نفسي.",
+      "after.s5": "بعد التحقق من جميع التفاصيل، يقررون ما يجب أن تكون عليه الخطوات التالية.",
+      "after.next.title": "من الخطوات التالية الممكنة:",
+      "after.next.1": "إجراء تحقيق داخلي",
+      "after.next.2": "تدريب إضافي للأشخاص الذين يعتنون بالأطفال",
+      "after.next.3": "ورش عمل للأطفال والشباب",
+      "after.next.4": "إبلاغ الشرطة",
+      "after.next.note": "ما يحدث بعد ذلك يعتمد على كل حالة. ويؤخذ كل بلاغ على محمل الجد ويتولاه أشخاص مدرَّبون على ذلك.",
+      "ombuds.text1": "إذا لم تتلقَّ رداً على بلاغك، أو شعرت بأنه لا يؤخذ على محمل الجد، أو لم تكن راضياً عن طريقة التعامل معه أو عن نتيجته، يمكنك التواصل مع مكتب أمين المظالم.",
+      "ombuds.text2": "مكتب أمين المظالم مستقل عن قرى الأطفال SOS. وأمين المظالم شخص ودود وجدير بالثقة، يحسن الاستماع ويمكنه المساعدة عندما لا تسير الأمور كما ينبغي، وهو موجود لدعم الأطفال والشباب مثلك وإرشادهم.",
+      "ombuds.link": "تواصل مع مكتب أمين المظالم في قرى الأطفال SOS"
+    },
+    "pt": {
+      "cta.button": "COMUNICAR UM PROBLEMA DE SEGURANÇA",
+      "intro.text": "Infelizmente, mesmo com todos os esforços de prevenção, os abusos podem continuar a acontecer. É dever das Aldeias de Crianças SOS proporcionar-lhe diferentes canais de denúncia para que possa contar às pessoas se tiver sofrido ou testemunhado um abuso ou apenas suspeitar dele. Mesmo que não tenha a certeza ou não disponha de provas, é importante que comunique o facto. As Aldeias de Crianças SOS analisarão todas as denúncias que receberem e responderão com as medidas adequadas.",
+      "process.title": "Processo de apresentação de relatórios",
+      "involve.title": "Algumas formas de as crianças e os jovens se envolverem na denúncia e na resposta são",
+      "cta.title": "Tem o direito de ser ouvido.",
+      "cta.text": "Se aconteceu alguma coisa consigo ou com outra pessoa, falar é um primeiro passo importante. A culpa do abuso não é sua. Merece estar em segurança, ser ouvido e apoiado.",
+      "where.title": "Onde pode denunciar?",
+      "share.title": "Que informação deve partilhar?",
+      "after.title": "O que acontece depois de denunciar?",
+      "ombuds.title": "E se a sua denúncia não for levada a sério?",
+      "where.adult.title": "Um adulto de confiança",
+      "where.adult.text": "Fale com um adulto em quem confie, como um dos pais, um cuidador ou um professor. Ele pode ajudá-lo a fazer uma denúncia.",
+      "where.team.title": "A sua pessoa ou equipa de proteção da criança",
+      "where.team.text": "Cada local e escritório das Aldeias de Crianças SOS tem uma pessoa ou uma equipa de proteção da criança. Pode comunicar-lhes diretamente qualquer preocupação.",
+      "where.hotline.title": "Uma linha de apoio de proteção da criança",
+      "where.hotline.text": "Deve existir uma linha de apoio para a qual pode ligar para comunicar uma preocupação. O número deve estar bem visível em cartazes no seu local SOS.",
+      "where.email.title": "Correio eletrónico",
+      "where.email.text": "Pode enviar um e-mail à sua equipa local de proteção da criança. O endereço deve estar bem visível em cartazes no seu local SOS.",
+      "where.speakup.title": "O canal de denúncia: SOS SpeakUp",
+      "where.speakup.text": "O canal de denúncia das Aldeias de Crianças SOS é um sistema de denúncia confidencial. Permite-lhe comunicar uma preocupação sem dizer quem é.",
+      "where.anon.title": "No SpeakUp, dar o seu nome é uma escolha sua",
+      "where.anon.text": "Se utilizar o canal de denúncia, pode escolher se dá ou não o seu nome. Quando fala diretamente com alguém, como um adulto de confiança ou a sua equipa de proteção da criança, essa pessoa saberá quem é. Todas as denúncias são levadas a sério, quer dê o seu nome quer não.",
+      "share.what.q": "O que aconteceu?",
+      "share.what.a": "Conte o que viu, viveu ou ouviu.",
+      "share.who.q": "Quem esteve envolvido?",
+      "share.who.a": "Indique os nomes das pessoas que sabe que estiveram envolvidas ou presentes, se os conhecer.",
+      "share.how.q": "Como aconteceu?",
+      "share.how.a": "Descreva o que aconteceu pela ordem de que se lembra.",
+      "share.when.q": "Quando aconteceu?",
+      "share.when.a": "Indique a data, a hora aproximada ou qualquer outro dado que ajude a perceber quando aconteceu.",
+      "share.reassure": "Não faz mal se não conseguir responder a todas as perguntas. Partilhe o que sabe e de que se lembra. Não precisa de investigar nem de reunir provas: uma equipa com formação especializada tratará disso.",
+      "after.s1": "A sua denúncia é recebida.",
+      "after.s2": "Uma equipa com formação especializada analisa a sua denúncia e avalia a informação que partilhou.",
+      "after.s3": "Se precisarem de compreender melhor alguma coisa e tiver dado os seus contactos, poderão contactá-lo para fazer mais perguntas.",
+      "after.s4": "Deverão também oferecer-lhe apoio, como a possibilidade de falar com um conselheiro ou um psicólogo.",
+      "after.s5": "Depois de verificarem todos os pormenores, decidem quais devem ser os próximos passos.",
+      "after.next.title": "Os próximos passos possíveis incluem:",
+      "after.next.1": "uma investigação interna",
+      "after.next.2": "formação adicional para as pessoas que cuidam das crianças",
+      "after.next.3": "oficinas para crianças e jovens",
+      "after.next.4": "informar a polícia",
+      "after.next.note": "O que acontece a seguir depende de cada situação. Todas as denúncias são levadas a sério e tratadas por pessoas com formação para o fazer.",
+      "ombuds.text1": "Se não receber resposta à sua denúncia, sentir que não está a ser levada a sério ou não estiver satisfeito com a forma como foi tratada ou com o resultado, pode contactar o Gabinete do Provedor (Ombuds).",
+      "ombuds.text2": "O Gabinete do Provedor (Ombuds) é independente das Aldeias de Crianças SOS. O Provedor é uma pessoa simpática e de confiança, que sabe ouvir e pode ajudar quando as coisas não parecem estar a funcionar como deviam: está lá para apoiar e orientar crianças e jovens como você.",
+      "ombuds.link": "Contactar o Gabinete do Provedor (Ombuds) das Aldeias de Crianças SOS"
+    },
+    "ru": {
+      "cta.button": "СООБЩИТЬ О ПРОБЛЕМЕ БЕЗОПАСНОСТИ",
+      "intro.text": "К сожалению, даже несмотря на все усилия по профилактике, жестокое обращение все равно может произойти. SOS Детские деревни обязаны предоставить вам различные каналы связи, чтобы вы могли рассказать людям, если вы стали свидетелем или свидетелем жестокого обращения или просто подозреваете его. Даже если вы не уверены или у вас нет доказательств, важно сообщить об этом. SOS Детские деревни рассмотрит все полученные сообщения и примет соответствующие меры.",
+      "process.title": "Процесс отчетности",
+      "involve.title": "Некоторые способы, с помощью которых дети и подростки могут принять участие в составлении отчетов и реагировании, таковы:",
+      "cta.title": "Вы заслуживаете, чтобы вас услышали.",
+      "cta.text": "Если что-то случилось с вами или с кем-то другим, рассказать об этом — важный первый шаг. Вы не виноваты в насилии. Вы заслуживаете безопасности, внимания и поддержки.",
+      "where.title": "Куда можно сообщить?",
+      "share.title": "Какой информацией нужно поделиться?",
+      "after.title": "Что происходит после сообщения?",
+      "ombuds.title": "Что делать, если ваше сообщение не восприняли всерьёз?",
+      "where.adult.title": "Взрослый, которому вы доверяете",
+      "where.adult.text": "Поговорите со взрослым, которому вы доверяете: с родителем, воспитателем или учителем. Он может помочь вам сообщить о случившемся.",
+      "where.team.title": "Ваш специалист или команда по защите детей",
+      "where.team.text": "В каждом подразделении и офисе SOS Детских деревень есть специалист или команда по защите детей. Вы можете сообщить им о любой проблеме напрямую.",
+      "where.hotline.title": "Горячая линия по защите детей",
+      "where.hotline.text": "Должна быть горячая линия, по которой можно позвонить и сообщить о проблеме. Номер должен быть хорошо виден на плакатах в вашем подразделении SOS.",
+      "where.email.title": "Электронная почта",
+      "where.email.text": "Вы можете написать по электронной почте в местную команду по защите детей. Адрес должен быть хорошо виден на плакатах в вашем подразделении SOS.",
+      "where.speakup.title": "Канал для сообщений о нарушениях: SOS SpeakUp",
+      "where.speakup.text": "Канал SOS Детских деревень для сообщений о нарушениях — это конфиденциальная система. Она позволяет сообщить о проблеме, не называя себя.",
+      "where.anon.title": "В SpeakUp вы сами решаете, называть ли своё имя",
+      "where.anon.text": "Если вы пользуетесь каналом для сообщений о нарушениях, вы можете выбрать, называть ли своё имя. Когда вы говорите с кем-то напрямую — со взрослым, которому доверяете, или с командой по защите детей, — они будут знать, кто вы. Каждое сообщение воспринимается всерьёз, независимо от того, назвали ли вы своё имя.",
+      "share.what.q": "Что произошло?",
+      "share.what.a": "Расскажите, что вы видели, пережили или слышали.",
+      "share.who.q": "Кто был причастен?",
+      "share.who.a": "Назовите имена людей, которые были причастны или присутствовали, если вы их знаете.",
+      "share.how.q": "Как это произошло?",
+      "share.how.a": "Опишите, что произошло, в том порядке, в котором вы это помните.",
+      "share.when.q": "Когда это произошло?",
+      "share.when.a": "Укажите дату, примерное время или что-то ещё, что поможет понять, когда это произошло.",
+      "share.reassure": "Ничего страшного, если вы не можете ответить на все вопросы. Расскажите то, что знаете и помните. Вам не нужно самим расследовать или собирать доказательства — этим займётся специально обученная команда.",
+      "after.s1": "Ваше сообщение получено.",
+      "after.s2": "Специально обученная команда изучает ваше сообщение и оценивает информацию, которой вы поделились.",
+      "after.s3": "Если им нужно лучше в чём-то разобраться и вы оставили свои контактные данные, они могут связаться с вами и задать дополнительные вопросы.",
+      "after.s4": "Вам также должны предложить поддержку, например возможность поговорить с консультантом или психологом.",
+      "after.s5": "Проверив все подробности, они решают, какими должны быть следующие шаги.",
+      "after.next.title": "Возможные следующие шаги:",
+      "after.next.1": "внутреннее расследование",
+      "after.next.2": "дополнительное обучение для людей, которые заботятся о детях",
+      "after.next.3": "занятия для детей и молодёжи",
+      "after.next.4": "обращение в полицию",
+      "after.next.note": "Что будет дальше, зависит от конкретной ситуации. Каждое сообщение воспринимается всерьёз, и им занимаются специально обученные люди.",
+      "ombuds.text1": "Если вы не получили ответа на своё сообщение, чувствуете, что его не воспринимают всерьёз, или недовольны тем, как его рассмотрели, или результатом, вы можете обратиться в Бюро омбудсмена.",
+      "ombuds.text2": "Бюро омбудсмена не зависит от SOS Детских деревень. Омбудсмен — доброжелательный человек, которому можно доверять: он умеет слушать и может помочь, когда что-то идёт не так, как должно. Он поддерживает и направляет детей и молодых людей, таких как вы.",
+      "ombuds.link": "Связаться с Бюро омбудсмена SOS Детских деревень"
+    }
   }
 };
-
-const LANGUAGES = {
-  en: { htmlLang: 'en',    dir: 'ltr', ogLocale: 'en_GB' },
-  es: { htmlLang: 'es',    dir: 'ltr', ogLocale: 'es_ES' },
-  fr: { htmlLang: 'fr',    dir: 'ltr', ogLocale: 'fr_FR' },
-  ar: { htmlLang: 'ar',    dir: 'rtl', ogLocale: 'ar_AR' },
-  pt: { htmlLang: 'pt-PT', dir: 'ltr', ogLocale: 'pt_PT' },
-  ru: { htmlLang: 'ru',    dir: 'ltr', ogLocale: 'ru_RU' }
-};
-const STORAGE_KEY = 'sos-staysafe-lang';   // shared by every page of the site
-const SITE_NAME = 'SOS StaySafe';
-const PAGE_VIDEO = 'reporting-abuse-banner';  // Videos/reporting-abuse-banner-{lang}.mp4
-const ENGLISH = {                         // completed from the HTML by captureEnglish()
-  'ui.play': 'Play animations',            // labels that only appear after an interaction
-  'ui.closeMenu': 'Close menu'
-};
-let currentLang = 'en';
-
-/** Read the English text and attribute values already in the page. */
-function captureEnglish() {
-  document.querySelectorAll('[data-i18n]').forEach(function (el) {
-    ENGLISH[el.dataset.i18n] = el.textContent.trim();
-  });
-  document.querySelectorAll('[data-i18n-attr]').forEach(function (el) {
-    const [attr, key] = el.dataset.i18nAttr.split(':');
-    ENGLISH[key] = el.getAttribute(attr);
-  });
-}
-
-/** Text for a key in a language; reports whether English had to be used instead. */
-function translate(key, lang) {
-  const own = lang !== 'en' && TRANSLATIONS[lang] && TRANSLATIONS[lang][key];
-  return own ? { text: own, fallback: false } : { text: ENGLISH[key], fallback: lang !== 'en' };
-}
-
-/** Mark English fallback text so screen readers pronounce it correctly. */
-function markFallback(el, fallback) {
-  if (fallback) { el.lang = 'en'; el.dir = 'ltr'; }
-  else { el.removeAttribute('lang'); el.removeAttribute('dir'); }
-}
-
-/** Replace every translatable text and attribute on the page. */
-function applyTranslations(lang) {
-  document.querySelectorAll('[data-i18n]').forEach(function (el) {
-    const t = translate(el.dataset.i18n, lang);
-    el.textContent = t.text;
-    markFallback(el, t.fallback);
-  });
-  document.querySelectorAll('[data-i18n-attr]').forEach(function (el) {
-    const [attr, key] = el.dataset.i18nAttr.split(':');
-    el.setAttribute(attr, translate(key, lang).text);
-  });
-}
-
-/** Language, direction and metadata on the <html> element and in <head>. */
-function applyDocumentLanguage(lang) {
-  const root = document.documentElement;
-  root.lang = LANGUAGES[lang].htmlLang;
-  root.dir = LANGUAGES[lang].dir;
-  root.dataset.lang = lang;
-  document.title = translate('nav.reporting', lang).text + ' | ' + SITE_NAME;
-  document.querySelector('meta[name="description"]').setAttribute('content', translate('intro.text', lang).text);
-  document.querySelector('meta[property="og:locale"]').setAttribute('content', LANGUAGES[lang].ogLocale);
-}
-
-/** Label each section that is still in English in the selected language. */
-function markEnglishSections() {
-  document.querySelectorAll('.station').forEach(function (section) {
-    section.querySelector('.lang-pill').hidden = !section.querySelector('[data-i18n][lang="en"]');
-  });
-}
-
-/* ---------- 2. Language selection ---------- */
-function saveLanguage(lang) {
-  try { localStorage.setItem(STORAGE_KEY, lang); } catch (e) { /* storage blocked */ }
-}
-
-/** Keep ?lang= in the address so the current view can be shared; English needs none. */
-function updateAddress(lang) {
-  try {
-    const url = new URL(location.href);
-    if (lang === 'en') url.searchParams.delete('lang'); else url.searchParams.set('lang', lang);
-    history.replaceState(null, '', url);
-  } catch (e) { /* some file:// contexts refuse; nothing else depends on it */ }
-}
-
-function updateLanguageControls(lang) {
-  document.getElementById('lang-select').value = lang;
-  document.querySelectorAll('.footer-langs button').forEach(function (btn) {
-    btn.setAttribute('aria-pressed', String(btn.dataset.lang === lang));
-  });
-}
-
-function setLanguage(lang) {
-  if (!LANGUAGES[lang]) throw new Error('Unsupported language: ' + lang);
-  currentLang = lang;
-  applyTranslations(lang);
-  applyDocumentLanguage(lang);
-  updateLanguageControls(lang);
-  updateMotionLabel();
-  markEnglishSections();
-  saveLanguage(lang);
-  updateAddress(lang);
-  onLanguageChangeVideo();
-}
-
-/* ---------- 3. Hero video and animated illustrations ---------- */
-const video = document.getElementById('hero-video');
-const motionToggle = document.getElementById('motion-toggle');
-const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-const saveDataOn = document.documentElement.classList.contains('save-data');
-let motionOn = !(reducedMotion.matches || saveDataOn);
-
-function videoUrl(lang) { return 'Videos/' + PAGE_VIDEO + '-' + lang + '.mp4'; }
-
-function playVideo() {
-  const url = videoUrl(currentLang);
-  if (video.getAttribute('src') !== url) video.setAttribute('src', url);
-  const attempt = video.play();
-  if (attempt) attempt.catch(function (err) {
-    if (err.name === 'NotAllowedError') setMotion(false);   // autoplay refused by the browser
-  });
-}
-
-/** Remove the source so the static poster shows again. */
-function clearVideo() {
-  video.pause();
-  video.removeAttribute('src');
-  video.load();
-}
-
-/** Swap to the new language's video, but only once the video has been started. */
-function onLanguageChangeVideo() {
-  if (!video.getAttribute('src')) return;
-  if (motionOn) playVideo(); else clearVideo();
-}
-
-/** Freeze an animated GIF on its current frame by drawing it on a canvas. */
-function freezeGif(img) {
-  if (img.hidden || !img.complete || !img.naturalWidth) return;
-  const canvas = document.createElement('canvas');
-  canvas.width = img.naturalWidth;
-  canvas.height = img.naturalHeight;
-  canvas.getContext('2d').drawImage(img, 0, 0);
-  canvas.setAttribute('aria-hidden', 'true');
-  img.after(canvas);
-  img.hidden = true;
-}
-
-function unfreezeGif(img) {
-  if (!img.hidden) return;
-  img.nextElementSibling.remove();
-  img.hidden = false;
-}
-
-function updateMotionLabel() {
-  const t = translate(motionOn ? 'ui.pause' : 'ui.play', currentLang);
-  motionToggle.setAttribute('aria-label', t.text);
-  motionToggle.setAttribute('aria-pressed', String(!motionOn));
-  markFallback(motionToggle, t.fallback);
-}
-
-/** One control for all motion on the page: the hero video and the animated illustrations. */
-function setMotion(on) {
-  motionOn = on;
-  updateMotionLabel();
-  document.querySelectorAll('img.anim').forEach(on ? unfreezeGif : freezeGif);
-  if (on) playVideo(); else video.pause();
-}
-
-video.addEventListener('error', function () {
-  console.warn('Homepage video could not be loaded: ' + video.getAttribute('src') + '. Showing the static image instead.');
-  video.removeAttribute('src');
-  video.load();
-});
-motionToggle.addEventListener('click', function () { setMotion(!motionOn); });
-reducedMotion.addEventListener('change', function (e) { if (e.matches) setMotion(false); });
-document.querySelectorAll('img.anim').forEach(function (img) {
-  img.addEventListener('load', function () { if (!motionOn) freezeGif(img); });
-});
-
-/** Outline an embedded module while focus is inside it. */
-const embeddedFrames = document.querySelectorAll('.embed-frame iframe');
-window.addEventListener('blur', function () {
-  setTimeout(function () {
-    embeddedFrames.forEach(function (f) { f.parentElement.classList.toggle('has-focus', document.activeElement === f); });
-  });
-});
-window.addEventListener('focus', function () {
-  embeddedFrames.forEach(function (f) { f.parentElement.classList.remove('has-focus'); });
-});
-
-/* ---------- 4. Mobile navigation ---------- */
-const navToggle = document.querySelector('.nav-toggle');
-const navPanel = document.getElementById('nav-panel');
-
-function setMenu(open) {
-  navToggle.setAttribute('aria-expanded', String(open));
-  navPanel.classList.toggle('is-open', open);
-  const t = translate(open ? 'ui.closeMenu' : 'ui.menu', currentLang);
-  navToggle.setAttribute('aria-label', t.text);
-  markFallback(navToggle, t.fallback);
-}
-
-navToggle.addEventListener('click', function () {
-  setMenu(navToggle.getAttribute('aria-expanded') !== 'true');
-});
-document.addEventListener('keydown', function (e) {
-  if (e.key === 'Escape' && navToggle.getAttribute('aria-expanded') === 'true') {
-    setMenu(false);
-    navToggle.focus();
-  }
-});
-window.matchMedia('(min-width: 1100px)').addEventListener('change', function () { setMenu(false); });
-
-/* ---------- Start ---------- */
-captureEnglish();
-document.getElementById('year').textContent = new Date().getFullYear();
-document.getElementById('lang-select').addEventListener('change', function (e) { setLanguage(e.target.value); });
-document.querySelectorAll('.footer-langs button').forEach(function (btn) {
-  btn.addEventListener('click', function () { setLanguage(btn.dataset.lang); });
-});
-setLanguage(document.documentElement.dataset.lang || 'en');
-updateMotionLabel();
-/* Start the video only after the rest of the page has loaded, so it never delays the content. */
-window.addEventListener('load', function () { if (motionOn) playVideo(); });
 </script>
+<script src="site.js?v=2026-11-25"></script>
 </body>
 </html>
-
